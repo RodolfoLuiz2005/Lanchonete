@@ -436,6 +436,95 @@ section.main-cards .interface a h4{
     color: var(--terceira-cor);
 }
 
+/* Promocoes (produtos vindos do painel admin) */
+section.main-cards .interface h2[data-admin-promocoes="true"] {
+    color: #fff6e8;
+    font-size: 1.7rem;
+}
+
+section.main-cards .interface .promocoes-grid[data-admin-promocoes="true"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(145deg, #fff7e6 0%, #ffe3bb 100%);
+    border: 2px solid #d98218;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    padding: 14px;
+    margin-bottom: 0;
+    transform: scale(1);
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] img {
+    width: 100%;
+    max-width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] .card-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] .card-info h2 {
+    color: #732c02;
+    padding: 0;
+    margin: 0;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] .card-info p {
+    display: block;
+    margin: 0;
+    color: #4d3726;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"] h4 {
+    color: #b04300;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+}
+
+section.main-cards .interface a.produto-destaque-admin[data-admin-promocoes="true"] {
+    border-color: #88a649;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+}
+
+section.main-cards .interface a.produto-destaque-admin[data-admin-promocoes="true"]::after {
+    content: "DESTAQUE";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #88a649;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+section.main-cards .interface a[data-admin-promocoes="true"]:hover {
+    transform: scale(1.03);
+}
+
+@media (max-width: 560px) {
+    section.main-cards .interface .promocoes-grid[data-admin-promocoes="true"] {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 /* Modal de produto */
 .modal-overlay {

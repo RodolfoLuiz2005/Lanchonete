@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Admin — MK</title>
+  <title>Login Admin - MK</title>
   <link rel="stylesheet" href="admin-premium.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
@@ -12,28 +12,58 @@
     <section class="login-brand">
       <span class="eyebrow">Painel premium</span>
       <h1>MK Lanchonete</h1>
-      <p>Controle produtos, promoções, pedidos, cozinha, mesas e faturamento em um só lugar.</p>
+      <p>Controle produtos, promocoes, pedidos, cozinha, mesas e faturamento em um so lugar.</p>
     </section>
     <form class="login-box" id="login-form">
       <h2>Acessar painel</h2>
-      <label>Usuário<input id="login-user" autocomplete="username" placeholder="admin"></label>
-      <label>Senha<input id="login-pass" type="password" autocomplete="current-password" placeholder="123456"></label>
+      <label>Usuario<input id="login-user" autocomplete="username" placeholder="admin" required></label>
+      <label>Senha<input id="login-pass" type="password" autocomplete="current-password" placeholder="123456" required></label>
       <button type="submit">Entrar</button>
-      <small>Login inicial: <strong>admin</strong> / <strong>123456</strong>. Altere em Configurações.</small>
+      <small>Login inicial: <strong>admin</strong> / <strong>123456</strong></small>
+      <small id="login-error" style="display:none;color:#b91c1c;"></small>
     </form>
   </main>
+
   <script src="mk-data.js"></script>
   <script>
-    document.getElementById('login-form').addEventListener('submit', function(e){
+    if (sessionStorage.getItem('mk_admin_auth') === 'ok' && window.MKStore && typeof MKStore.adminCredentials === 'function') {
+      const current = MKStore.adminCredentials();
+      const sessionUser = String(sessionStorage.getItem('mk_admin_user') || '').trim().toLowerCase();
+      if (sessionUser && sessionUser === String(current.usuario || '').trim().toLowerCase()) {
+        location.href = 'admin.html';
+      }
+    }
+
+    document.getElementById('login-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      const cfg = MKStore.config();
-      const u = document.getElementById('login-user').value.trim();
-      const p = document.getElementById('login-pass').value.trim();
-      if(u === cfg.usuario && p === cfg.senha){
-        sessionStorage.setItem('mk_admin_auth','ok');
-        location.href='admin.html';
-      } else alert('Usuário ou senha inválidos.');
+
+      const username = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value.trim();
+      const errorBox = document.getElementById('login-error');
+      if (errorBox) {
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+      }
+
+      const ok = (window.MKStore && typeof MKStore.verifyAdminCredentials === 'function')
+        ? MKStore.verifyAdminCredentials(username, password)
+        : (username === 'admin' && password === '123456');
+
+      if (ok) {
+        sessionStorage.setItem('mk_admin_auth', 'ok');
+        sessionStorage.setItem('mk_admin_user', username);
+        location.href = 'admin.html';
+        return;
+      }
+
+      if (errorBox) {
+        errorBox.textContent = 'Usuario ou senha incorretos.';
+        errorBox.style.display = 'block';
+      } else {
+        alert('Usuario ou senha incorretos.');
+      }
     });
+
   </script>
 </body>
 </html>

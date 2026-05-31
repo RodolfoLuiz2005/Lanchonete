@@ -99,7 +99,8 @@ button {
 
 .login-box input,
 .form-grid input,
-.form-grid textarea {
+.form-grid textarea,
+.form-grid select {
     border: 1px solid #ead9cd;
     background: white;
     border-radius: 14px;

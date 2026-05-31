@@ -374,7 +374,7 @@ if (orderIntakeOverlay) {
     orderIntakeOverlay.addEventListener('click', closeOrderIntakeModal);
 }
 
-const productCards = document.querySelectorAll('section.main-cards .interface > a');
+const productsContainer = document.querySelector('section.main-cards .interface');
 const modal = document.getElementById('product-modal');
 const modalOverlay = document.getElementById('modal-overlay');
 const modalClose = document.getElementById('modal-close');
@@ -417,7 +417,12 @@ function normalizeText(value) {
 }
 
 function getCart() {
-    return JSON.parse(localStorage.getItem('mk_cart') || '[]');
+    try {
+        const data = JSON.parse(localStorage.getItem('mk_cart') || '[]');
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        return [];
+    }
 }
 
 function saveCart(cart) {
@@ -425,7 +430,12 @@ function saveCart(cart) {
 }
 
 function getOrders() {
-    return JSON.parse(localStorage.getItem('mk_pedidos') || '[]');
+    try {
+        const data = JSON.parse(localStorage.getItem('mk_pedidos') || '[]');
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        return [];
+    }
 }
 
 function saveOrders(orders) {
@@ -663,12 +673,15 @@ function closeModal() {
     document.getElementById('calda-select').selectedIndex = 0;
 }
 
-productCards.forEach((card) => {
-    card.addEventListener('click', (event) => {
+if (productsContainer) {
+    productsContainer.addEventListener('click', (event) => {
+        const card = event.target.closest('a');
+        if (!card || !productsContainer.contains(card)) return;
+        if (!card.querySelector('.card-info')) return;
         event.preventDefault();
         openModal(getProductFromCard(card));
     });
-});
+}
 
 updateCartCount();
 renderCartOrderSummary();

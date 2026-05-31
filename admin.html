@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo — MK</title>
+  <title>Painel Administrativo - MK</title>
   <link rel="stylesheet" href="admin-premium.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
@@ -13,13 +13,13 @@
     <nav>
       <button class="nav-btn active" data-page="dashboard"><i class="bi bi-grid"></i>Dashboard</button>
       <button class="nav-btn" data-page="produtos"><i class="bi bi-basket"></i>Produtos</button>
-      <button class="nav-btn" data-page="promocoes"><i class="bi bi-percent"></i>Promoções</button>
+      <button class="nav-btn" data-page="promocoes"><i class="bi bi-percent"></i>Promocoes</button>
       <button class="nav-btn" data-page="pedidos"><i class="bi bi-receipt"></i>Pedidos</button>
       <button class="nav-btn" data-page="mesas"><i class="bi bi-qr-code"></i>Mesas / QR Code</button>
-      <button class="nav-btn" data-page="config"><i class="bi bi-gear"></i>Configurações</button>
+      <button class="nav-btn" data-page="config"><i class="bi bi-gear"></i>Configuracoes</button>
     </nav>
     <a class="side-link" href="cozinha.html" target="_blank"><i class="bi bi-display"></i>Abrir cozinha</a>
-    <a class="side-link" href="index.html" target="_blank"><i class="bi bi-shop"></i>Ver cardápio</a>
+    <a class="side-link" href="index.html" target="_blank"><i class="bi bi-shop"></i>Ver cardapio</a>
     <button class="logout" id="logout"><i class="bi bi-box-arrow-right"></i>Sair</button>
   </aside>
 
@@ -34,8 +34,8 @@
       <div class="cards kpis">
         <article class="card"><small>Faturamento hoje</small><strong id="fat-hoje">R$ 0,00</strong><span id="pedidos-hoje-mini">0 pedidos</span></article>
         <article class="card"><small>Faturamento semana</small><strong id="fat-semana">R$ 0,00</strong><span>semana atual</span></article>
-        <article class="card"><small>Faturamento mês</small><strong id="fat-mes">R$ 0,00</strong><span>mês atual</span></article>
-        <article class="card"><small>Ticket médio</small><strong id="ticket-medio">R$ 0,00</strong><span>hoje</span></article>
+        <article class="card"><small>Faturamento mes</small><strong id="fat-mes">R$ 0,00</strong><span>mes atual</span></article>
+        <article class="card"><small>Ticket medio</small><strong id="ticket-medio">R$ 0,00</strong><span>hoje</span></article>
       </div>
       <div class="grid-2">
         <article class="panel"><h2>Resumo de vendas</h2><div id="sales-bars" class="bars"></div></article>
@@ -45,15 +45,31 @@
 
     <section id="produtos" class="page">
       <div class="panel">
-        <div class="panel-head"><h2>Gestão de produtos</h2><button id="new-product" class="primary">Novo produto</button></div>
+        <div class="panel-head"><h2>Gestao de produtos</h2><button id="new-product" class="primary">Novo produto</button></div>
         <form id="product-form" class="form-grid hidden">
           <input type="hidden" id="product-id">
           <label>Nome<input id="product-name" required></label>
-          <label>Categoria<input id="product-category" placeholder="Hambúrguer, Pizza..."></label>
-          <label>Preço<input id="product-price" type="number" step="0.01" required></label>
-          <label>Imagem<input id="product-image" placeholder="img/hamb.gourmet.jpg"></label>
-          <label class="full">Descrição<textarea id="product-desc"></textarea></label>
-          <label class="check"><input id="product-active" type="checkbox" checked> Disponível</label>
+          <label>Categoria
+            <select id="product-category">
+              <option value="Pizza">Pizza</option>
+              <option value="Doces">Doces</option>
+              <option value="Hamburguer Tradicional">Hamburguer Tradicional</option>
+              <option value="Hamburguer Gourmet">Hamburguer Gourmet</option>
+              <option value="Sorvete">Sorvete</option>
+              <option value="Acai">Acai</option>
+              <option value="Bebidas">Bebidas</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+          <label>Preco<input id="product-price" type="number" step="0.01" required></label>
+          <label>Imagem
+            <input id="product-image-file" type="file" accept="image/*">
+          </label>
+          <label>Preview
+            <img id="product-image-preview" alt="Preview da imagem" style="max-width:120px; max-height:120px; object-fit:cover; border-radius:10px; border:1px solid #ead9cd; background:#fff;">
+          </label>
+          <label class="full">Descricao<textarea id="product-desc"></textarea></label>
+          <label class="check"><input id="product-active" type="checkbox" checked> Disponivel</label>
           <label class="check"><input id="product-featured" type="checkbox"> Destaque</label>
           <div class="actions full"><button class="primary" type="submit">Salvar produto</button><button type="button" id="cancel-product">Cancelar</button></div>
         </form>
@@ -63,14 +79,24 @@
 
     <section id="promocoes" class="page">
       <div class="panel">
-        <div class="panel-head"><h2>Promoções</h2><button id="new-promo" class="primary">Nova promoção</button></div>
+        <div class="panel-head"><h2>Promocoes</h2><button id="new-promo" class="primary">Nova promocao</button></div>
         <form id="promo-form" class="form-grid hidden">
           <input type="hidden" id="promo-id">
-          <label>Título<input id="promo-title" required></label>
-          <label>Desconto %<input id="promo-discount" type="number" min="0" max="100" value="10"></label>
-          <label class="full">Descrição<textarea id="promo-desc"></textarea></label>
+          <label>Nome da promocao<input id="promo-name" required></label>
+          <label>Preco promocional<input id="promo-price" type="number" min="0" step="0.01" required></label>
+          <label>Estilo da promocao
+            <select id="promo-style">
+              <option value="desconto">Desconto</option>
+              <option value="combo">Combo</option>
+              <option value="clone">Clone</option>
+              <option value="destaque">Destaque</option>
+            </select>
+          </label>
+          <label>Imagem<input id="promo-image" placeholder="img/hamb.gourmet.jpg"></label>
+          <label class="full">Descricao<textarea id="promo-desc"></textarea></label>
+          <label class="check"><input id="promo-show-menu" type="checkbox"> Mostrar no cardapio geral</label>
           <label class="check"><input id="promo-active" type="checkbox" checked> Ativa</label>
-          <div class="actions full"><button class="primary" type="submit">Salvar promoção</button><button type="button" id="cancel-promo">Cancelar</button></div>
+          <div class="actions full"><button class="primary" type="submit">Salvar promocao</button><button type="button" id="cancel-promo">Cancelar</button></div>
         </form>
         <div id="promos-table" class="table"></div>
       </div>
@@ -81,17 +107,30 @@
     </section>
 
     <section id="mesas" class="page">
-      <div class="panel"><h2>QR Code das mesas</h2><p class="muted">Use o link da mesa no QR Code. Futuramente dá para gerar a imagem automaticamente.</p><div id="tables-list" class="qr-grid"></div></div>
+      <div class="panel"><h2>QR Code das mesas</h2><p class="muted">Use o link da mesa no QR Code. Futuramente da para gerar a imagem automaticamente.</p><div id="tables-list" class="qr-grid"></div></div>
     </section>
 
     <section id="config" class="page">
-      <div class="panel"><h2>Configurações</h2>
+      <div class="panel"><h2>Configuracoes</h2>
         <form id="config-form" class="form-grid">
-          <label>Nome da loja<input id="cfg-loja"></label>
-          <label>Usuário admin<input id="cfg-user"></label>
-          <label>Senha admin<input id="cfg-pass"></label>
-          <label>Quantidade de mesas<input id="cfg-mesas" type="number" min="1"></label>
-          <div class="actions full"><button class="primary" type="submit">Salvar configurações</button></div>
+          <label>Quantidade de mesas<input id="cfg-mesas" type="number" min="1" step="1" required></label>
+          <div class="actions full">
+            <button class="primary" type="submit">Salvar configuracoes</button>
+            <button type="button" id="close-config">Fechar</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Seguranca / Credenciais</h2>
+        <form id="security-form" class="form-grid">
+          <label>Usuario<input id="sec-user" autocomplete="username" required></label>
+          <label>Senha atual<input id="sec-current-pass" type="password" autocomplete="current-password" required></label>
+          <label>Nova senha<input id="sec-new-pass" type="password" autocomplete="new-password" required></label>
+          <label>Confirmar nova senha<input id="sec-confirm-pass" type="password" autocomplete="new-password" required></label>
+          <div class="actions full">
+            <button class="primary" type="submit" id="change-password">Alterar senha</button>
+            <button type="button" id="cancel-security">Cancelar</button>
+          </div>
         </form>
       </div>
     </section>

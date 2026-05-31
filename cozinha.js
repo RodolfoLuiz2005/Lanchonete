@@ -1,7 +1,36 @@
+function hasValidAdminSession() {
+  if (sessionStorage.getItem('mk_admin_auth') !== 'ok') return false;
+  if (!window.MKStore || typeof MKStore.adminCredentials !== 'function') return false;
+  const sessionUser = String(sessionStorage.getItem('mk_admin_user') || '').trim().toLowerCase();
+  const currentUser = String(MKStore.adminCredentials().usuario || '').trim().toLowerCase();
+  return !!sessionUser && sessionUser === currentUser;
+}
+
+if (!hasValidAdminSession()) {
+  location.href = 'admin-login.html';
+}
+
 let lastIds = new Set(MKStore.orders().map((o) => String(o.id)));
 let soundEnabled = false;
 
 const money = (v) => MKStore.BRL.format(Number(v || 0));
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJsString(value) {
+  return String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n');
+}
 
 function beep() {
   if (!soundEnabled) return;
@@ -100,26 +129,26 @@ function renderOrderDetailsHtml(order) {
 
   const phone = orderPhone(order);
   if (phone) {
-    details.push(`<p><strong>Telefone:</strong> ${phone}</p>`);
+    details.push(`<p><strong>Telefone:</strong> ${escapeHtml(phone)}</p>`);
   }
 
   if (tipo === 'delivery') {
     const endereco = formatAddress(order);
     if (endereco) {
-      details.push(`<p><strong>Endereco:</strong> ${endereco}</p>`);
+      details.push(`<p><strong>Endereco:</strong> ${escapeHtml(endereco)}</p>`);
     }
   }
 
   if (tipo === 'retirada') {
     const horario = orderPickupTime(order);
     if (horario) {
-      details.push(`<p><strong>Retirada:</strong> ${horario}</p>`);
+      details.push(`<p><strong>Retirada:</strong> ${escapeHtml(horario)}</p>`);
     }
   }
 
   const obs = orderNotes(order);
   if (obs) {
-    details.push(`<p><strong>Observacao:</strong> ${obs}</p>`);
+    details.push(`<p><strong>Observacao:</strong> ${escapeHtml(obs)}</p>`);
   }
 
   return details.join('');
@@ -135,15 +164,15 @@ function printText(order) {
 
   const lines = [
     '========================',
-    `Pedido #${order.codigo || order.id}`,
-    `Tipo: ${typeLabel(order)}${mesa ? ` | Mesa ${mesa}` : ''}`,
-    `Cliente: ${order.cliente || 'Cliente'}`
+    `Pedido #${escapeHtml(order.codigo || order.id)}`,
+    `Tipo: ${typeLabel(order)}${mesa ? ` | Mesa ${escapeHtml(mesa)}` : ''}`,
+    `Cliente: ${escapeHtml(order.cliente || 'Cliente')}`
   ];
 
-  if (phone) lines.push(`Telefone: ${phone}`);
-  if (tipo === 'delivery' && endereco) lines.push(`Endereco: ${endereco}`);
-  if (tipo === 'retirada' && horario) lines.push(`Retirada: ${horario}`);
-  if (obs) lines.push(`Obs: ${obs}`);
+  if (phone) lines.push(`Telefone: ${escapeHtml(phone)}`);
+  if (tipo === 'delivery' && endereco) lines.push(`Endereco: ${escapeHtml(endereco)}`);
+  if (tipo === 'retirada' && horario) lines.push(`Retirada: ${escapeHtml(horario)}`);
+  if (obs) lines.push(`Obs: ${escapeHtml(obs)}`);
 
   lines.push('------------------------');
   lines.push(...(order.itens || []));
@@ -179,7 +208,7 @@ function printOrder(id) {
     alert('Nao foi possivel abrir a janela de impressao. Verifique se o bloqueador de pop-up esta ativo.');
     return;
   }
-  w.document.write(`<pre style="font:16px monospace">${printText(order)}</pre>`);
+  w.document.write(`<pre style="font:16px monospace">${escapeHtml(printText(order))}</pre>`);
   w.print();
 }
 
@@ -206,16 +235,17 @@ function render() {
     if (!col) return;
 
     const mesa = orderTable(order);
+    const safeId = escapeJsString(order.id);
     const card = document.createElement('article');
     card.className = `k-card ${!lastIds.has(String(order.id)) ? 'new' : ''}`;
 
     card.innerHTML = `
-      <header><strong>#${order.codigo || order.id}</strong><span>${money(order.total)}</span></header>
-      <div class="meta"><span class="tag">${typeLabel(order)}</span>${mesa ? `<span class="tag">Mesa ${mesa}</span>` : ''}${ageTag(order)}</div>
-      <p><strong>Cliente:</strong> ${order.cliente || 'Cliente'}</p>
+      <header><strong>#${escapeHtml(order.codigo || order.id)}</strong><span>${money(order.total)}</span></header>
+      <div class="meta"><span class="tag">${typeLabel(order)}</span>${mesa ? `<span class="tag">Mesa ${escapeHtml(mesa)}</span>` : ''}${ageTag(order)}</div>
+      <p><strong>Cliente:</strong> ${escapeHtml(order.cliente || 'Cliente')}</p>
       ${renderOrderDetailsHtml(order)}
-      <ul>${(order.itens || []).map((item) => `<li>${item}</li>`).join('')}</ul>
-      <div class="k-actions"><button class="print" onclick="printOrder('${order.id}')">Imprimir</button>${order.status !== 'finalizado' ? `<button class="done" onclick="advance('${order.id}')">Avancar</button>` : ''}</div>
+      <ul>${(order.itens || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+      <div class="k-actions"><button class="print" onclick="printOrder('${safeId}')">Imprimir</button>${order.status !== 'finalizado' ? `<button class="done" onclick="advance('${safeId}')">Avancar</button>` : ''}</div>
     `;
 
     col.appendChild(card);
