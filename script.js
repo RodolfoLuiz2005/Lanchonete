@@ -2,22 +2,73 @@ const btnMenu = document.getElementById('btn-menu');
 const menu = document.getElementById('menu');
 const overlay = document.getElementById('overlay-menu');
 const btnFechar = document.getElementById('btn-fechar');
+const header = document.querySelector('header');
+
+function openMainMenu() {
+    if (!menu) return;
+    menu.classList.add('abrir-menu');
+    document.body.classList.add('menu-open');
+}
+
+function closeMainMenu() {
+    if (!menu) return;
+    menu.classList.remove('abrir-menu');
+    document.body.classList.remove('menu-open');
+}
 
 if (btnMenu && menu) {
-    btnMenu.addEventListener('click', () => {
-        menu.classList.add('abrir-menu');
-    });
+    btnMenu.addEventListener('click', openMainMenu);
 }
 
 if (btnFechar && menu) {
-    btnFechar.addEventListener('click', () => {
-        menu.classList.remove('abrir-menu');
-    });
+    btnFechar.addEventListener('click', closeMainMenu);
 }
 
 if (overlay && menu) {
-    overlay.addEventListener('click', () => {
-        menu.classList.remove('abrir-menu');
+    overlay.addEventListener('click', closeMainMenu);
+}
+
+if (header) {
+    const updateHeaderScrollState = () => {
+        header.classList.toggle('is-scrolled', window.scrollY > 18);
+    };
+
+    let headerScrollTicking = false;
+    window.addEventListener('scroll', () => {
+        if (headerScrollTicking) return;
+
+        headerScrollTicking = true;
+        window.requestAnimationFrame(() => {
+            updateHeaderScrollState();
+            headerScrollTicking = false;
+        });
+    }, { passive: true });
+
+    const markHeaderLoaded = () => {
+        header.classList.add('is-loaded');
+        updateHeaderScrollState();
+    };
+
+    window.requestAnimationFrame(markHeaderLoaded);
+    window.addEventListener('load', markHeaderLoaded);
+
+    if (document.readyState !== 'loading') {
+        markHeaderLoaded();
+    }
+}
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeMainMenu();
+    }
+});
+
+if (menu) {
+    menu.addEventListener('click', (event) => {
+        const link = event.target.closest('a');
+        if (link) {
+            closeMainMenu();
+        }
     });
 }
 
@@ -36,7 +87,7 @@ function saveOrderContext(context) {
 }
 
 function getTipoPedido(rawOrder) {
-    return rawOrder?.tipoPedido || rawOrder?.tipo || '';
+    return rawOrder.tipoPedido || rawOrder.tipo || '';
 }
 
 function tipoPedidoLabel(tipoPedido) {
@@ -45,7 +96,7 @@ function tipoPedidoLabel(tipoPedido) {
         mesa: 'Estou na loja / mesa',
         retirada: 'Vou pedir de casa e retirar na loja'
     };
-    return labels[tipoPedido] || 'Nao informado';
+    return labels[tipoPedido] || 'Não informado';
 }
 
 function escapeHtml(value) {
@@ -89,10 +140,10 @@ function buildOrderSummaryHtml(info) {
     if (info.tipoPedido === 'delivery') {
         const endereco = buildAddressLine(info.endereco);
         if (endereco) {
-            base.push(`<p><strong>Endereco:</strong> ${escapeHtml(endereco)}</p>`);
+            base.push(`<p><strong>Endereço:</strong> ${escapeHtml(endereco)}</p>`);
         }
         if (info.observacaoPedido) {
-            base.push(`<p><strong>Observacao:</strong> ${escapeHtml(info.observacaoPedido)}</p>`);
+            base.push(`<p><strong>Observação:</strong> ${escapeHtml(info.observacaoPedido)}</p>`);
         }
     }
 
@@ -102,10 +153,10 @@ function buildOrderSummaryHtml(info) {
 
     if (info.tipoPedido === 'retirada') {
         if (info.horarioRetirada) {
-            base.push(`<p><strong>Horario retirada:</strong> ${escapeHtml(info.horarioRetirada)}</p>`);
+            base.push(`<p><strong>Horário de retirada:</strong> ${escapeHtml(info.horarioRetirada)}</p>`);
         }
         if (info.observacao) {
-            base.push(`<p><strong>Observacao:</strong> ${escapeHtml(info.observacao)}</p>`);
+            base.push(`<p><strong>Observação:</strong> ${escapeHtml(info.observacao)}</p>`);
         }
     }
 
@@ -169,7 +220,7 @@ function mountDeliveryForm() {
     if (!orderIntakeTitle || !orderIntakeBody) return;
 
     const current = getOrderContext();
-    const saved = current?.tipoPedido === 'delivery' ? current : {};
+    const saved = current && current.tipoPedido === 'delivery' ? current : {};
     const endereco = saved.endereco || {};
 
     orderIntakeTitle.textContent = 'Dados para delivery';
@@ -178,11 +229,11 @@ function mountDeliveryForm() {
             <input name="nome" placeholder="Nome" value="${escapeHtml(saved.nome || '')}" required>
             <input name="telefone" placeholder="Telefone" value="${escapeHtml(saved.telefone || '')}" required>
             <input name="rua" placeholder="Rua" value="${escapeHtml(endereco.rua || '')}" required>
-            <input name="numero" placeholder="Numero" value="${escapeHtml(endereco.numero || '')}" required>
+            <input name="numero" placeholder="Número" value="${escapeHtml(endereco.numero || '')}" required>
             <input name="bairro" placeholder="Bairro" value="${escapeHtml(endereco.bairro || '')}" required>
             <input name="complemento" placeholder="Complemento" value="${escapeHtml(endereco.complemento || '')}">
-            <input name="pontoReferencia" placeholder="Ponto de referencia" value="${escapeHtml(endereco.pontoReferencia || '')}">
-            <textarea name="observacaoPedido" placeholder="Observacao do pedido">${escapeHtml(saved.observacaoPedido || '')}</textarea>
+            <input name="pontoReferencia" placeholder="Ponto de referência" value="${escapeHtml(endereco.pontoReferencia || '')}">
+            <textarea name="observacaoPedido" placeholder="Observação do pedido">${escapeHtml(saved.observacaoPedido || '')}</textarea>
             <div class="order-intake-actions">
                 <button type="submit" class="save">Salvar dados</button>
             </div>
@@ -211,7 +262,7 @@ function mountDeliveryForm() {
         };
 
         if (!isOrderContextValid(context)) {
-            alert('Preencha todos os campos obrigatorios do delivery.');
+            alert('Preencha todos os campos obrigatórios do delivery.');
             return;
         }
 
@@ -228,14 +279,14 @@ function mountMesaForm() {
     if (!orderIntakeTitle || !orderIntakeBody) return;
 
     const current = getOrderContext();
-    const saved = current?.tipoPedido === 'mesa' ? current : {};
+    const saved = current && current.tipoPedido === 'mesa' ? current : {};
 
     orderIntakeTitle.textContent = 'Estou na loja / mesa';
     orderIntakeBody.innerHTML = `
         <form class="order-intake-form" id="mesa-form">
             <input name="nome" placeholder="Nome" value="${escapeHtml(saved.nome || '')}" required>
             <input name="telefone" placeholder="Telefone" value="${escapeHtml(saved.telefone || '')}" required>
-            <input name="numeroMesa" placeholder="Numero da mesa" value="${escapeHtml(saved.numeroMesa || '')}" required>
+            <input name="numeroMesa" placeholder="Número da mesa" value="${escapeHtml(saved.numeroMesa || '')}" required>
             <div class="order-intake-actions">
                 <button type="button" class="back" id="back-to-choice">Voltar</button>
                 <button type="submit" class="save">Salvar dados</button>
@@ -264,7 +315,7 @@ function mountMesaForm() {
         };
 
         if (!isOrderContextValid(context)) {
-            alert('Preencha todos os campos obrigatorios da mesa.');
+            alert('Preencha todos os campos obrigatórios da mesa.');
             return;
         }
 
@@ -281,15 +332,15 @@ function mountRetiradaForm() {
     if (!orderIntakeTitle || !orderIntakeBody) return;
 
     const current = getOrderContext();
-    const saved = current?.tipoPedido === 'retirada' ? current : {};
+    const saved = current && current.tipoPedido === 'retirada' ? current : {};
 
     orderIntakeTitle.textContent = 'Vou pedir de casa e retirar na loja';
     orderIntakeBody.innerHTML = `
         <form class="order-intake-form" id="retirada-form">
             <input name="nome" placeholder="Nome" value="${escapeHtml(saved.nome || '')}" required>
             <input name="telefone" placeholder="Telefone" value="${escapeHtml(saved.telefone || '')}" required>
-            <input name="horarioRetirada" placeholder="Horario aproximado para retirada" value="${escapeHtml(saved.horarioRetirada || '')}" required>
-            <textarea name="observacao" placeholder="Observacao">${escapeHtml(saved.observacao || '')}</textarea>
+            <input name="horarioRetirada" placeholder="Horário aproximado para retirada" value="${escapeHtml(saved.horarioRetirada || '')}" required>
+            <textarea name="observacao" placeholder="Observação">${escapeHtml(saved.observacao || '')}</textarea>
             <div class="order-intake-actions">
                 <button type="button" class="back" id="back-to-choice">Voltar</button>
                 <button type="submit" class="save">Salvar dados</button>
@@ -319,7 +370,7 @@ function mountRetiradaForm() {
         };
 
         if (!isOrderContextValid(context)) {
-            alert('Preencha todos os campos obrigatorios da retirada.');
+            alert('Preencha todos os campos obrigatórios da retirada.');
             return;
         }
 
@@ -337,7 +388,7 @@ function mountRetiradaChoice() {
 
     orderIntakeTitle.textContent = 'Pedir e retirar';
     orderIntakeBody.innerHTML = `
-        <p>Escolha como voce vai retirar:</p>
+        <p>Escolha como você vai retirar:</p>
         <div class="order-choice-buttons">
             <button type="button" id="order-choice-mesa">Estou na loja / mesa</button>
             <button type="button" id="order-choice-retirada">Vou pedir de casa e retirar na loja</button>
@@ -395,6 +446,7 @@ const cartItemsContainer = document.getElementById('cart-items');
 const cartTotal = document.getElementById('cart-total');
 const finalizeButton = document.getElementById('btn-finalize');
 const cartOrderSummary = document.getElementById('cart-order-summary');
+const MAX_ACAI_ACOMPANHAMENTOS = 7;
 
 let currentQty = 1;
 let currentProduct = null;
@@ -414,6 +466,66 @@ function normalizeText(value) {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
+}
+
+function isAcaiProduct(product) {
+    return product.category === 'acai' || normalizeText(product.title).includes('acai');
+}
+
+function getAcaiDetails(title) {
+    const normalized = normalizeText(title);
+    const tamanhoMatch = String(title || '').match(/(\d+\s*ML)/i);
+    return {
+        tamanho: tamanhoMatch ? tamanhoMatch[1].replace(/\s+/g, '') : '',
+        sorvete: normalized.includes('c/sorvete') ? 'Com sorvete' : (normalized.includes('s/sorvete') ? 'Sem sorvete' : '')
+    };
+}
+
+function getAcaiSelectedAcompanhamentos() {
+    return [...document.querySelectorAll('.acai-acompanhamento:checked')].map((item) => item.value);
+}
+
+function updateAcaiCounter(message = '') {
+    const counter = document.getElementById('acai-counter');
+    const warning = document.getElementById('acai-warning');
+    const total = getAcaiSelectedAcompanhamentos().length;
+
+    if (counter) {
+        counter.textContent = `Acompanhamentos selecionados: ${total}/${MAX_ACAI_ACOMPANHAMENTOS}`;
+    }
+
+    if (warning) {
+        warning.textContent = message;
+    }
+}
+
+function resetAcaiOptions() {
+    document
+        .querySelectorAll('#extras-container input[type="checkbox"]')
+        .forEach((input) => {
+            input.checked = false;
+        });
+
+    const caldaSelect = document.getElementById('calda-select');
+    if (caldaSelect) caldaSelect.selectedIndex = 0;
+
+    updateAcaiCounter('');
+}
+
+function formatCartItemDetails(item) {
+    const details = [];
+    if (item.tamanho) details.push(`Tamanho: ${item.tamanho}`);
+    if (item.sorvete) details.push(item.sorvete);
+    if (item.acompanhamentos.length) details.push(`Acompanhamentos: ${item.acompanhamentos.join(', ')}`);
+    if (item.calda) details.push(`Calda: ${item.calda}`);
+    if (item.adicionais.length) details.push(`Adicionais: ${item.adicionais.join(', ')}`);
+    return details;
+}
+
+function formatCartItemLine(item) {
+    const details = formatCartItemDetails(item);
+    const base = `${item.qty || 1}x ${item.title}`;
+    return details.length ? `${base} | ${details.join(' | ')}` : base;
 }
 
 function getCart() {
@@ -450,11 +562,11 @@ function updateCartCount() {
 }
 
 function getProductFromCard(card) {
-    const title = card.querySelector('.card-info h2')?.textContent.trim() || '';
-    const desc = card.querySelector('.card-info p')?.textContent.trim() || '';
-    const priceText = card.querySelector('.card-info h4')?.textContent.trim() || 'R$ 0,00';
+    const title = card.querySelector('.card-info h2').textContent.trim() || '';
+    const desc = card.querySelector('.card-info p').textContent.trim() || '';
+    const priceText = card.querySelector('.card-info h4').textContent.trim() || 'R$ 0,00';
     const price = parsePrice(priceText);
-    const img = card.querySelector('img')?.src || '';
+    const img = card.querySelector('img').src || '';
 
     return {
         title,
@@ -472,6 +584,8 @@ function addToCart(product, qty = 1) {
         JSON.stringify(item.acompanhamentos) === JSON.stringify(product.acompanhamentos) &&
         JSON.stringify(item.adicionais || []) === JSON.stringify(product.adicionais || []) &&
         item.calda === product.calda &&
+        item.tamanho === product.tamanho &&
+        item.sorvete === product.sorvete &&
         Number(item.adicional || 0) === Number(product.adicional || 0)
     );
 
@@ -486,6 +600,8 @@ function addToCart(product, qty = 1) {
             acompanhamentos: product.acompanhamentos || [],
             adicionais: product.adicionais || [],
             calda: product.calda || '',
+            tamanho: product.tamanho || '',
+            sorvete: product.sorvete || '',
             adicional: product.adicional || 0
         });
     }
@@ -520,7 +636,7 @@ function renderCart() {
     if (!orderContext || !orderContext.tipoPedido) {
         const warning = document.createElement('p');
         warning.className = 'cart-order-warning';
-        warning.textContent = 'Antes de finalizar, escolha Delivery ou Pedir e retirar e preencha seus dados.';
+        warning.textContent = 'Antes de finalizar, escolha Delivery ou Peça e retire e preencha seus dados.';
         cartItemsContainer.appendChild(warning);
     }
 
@@ -539,10 +655,12 @@ function renderCart() {
         const card = document.createElement('div');
         card.className = 'cart-item';
         card.innerHTML = `
-            <button class="cart-item-remove">×</button>
+            <button class="cart-item-remove" type="button" aria-label="Remover item">X</button>
             <h3>${escapeHtml(item.title)}</h3>
-            ${item.acompanhamentos?.length ? `<span><strong>Acompanhamentos:</strong> ${escapeHtml(item.acompanhamentos.join(', '))}</span>` : ''}
-            ${item.adicionais?.length ? `<span><strong>Adicionais:</strong> ${escapeHtml(item.adicionais.join(', '))}</span>` : ''}
+            ${item.tamanho ? `<span><strong>Tamanho:</strong> ${escapeHtml(item.tamanho)}</span>` : ''}
+            ${item.sorvete ? `<span><strong>Sorvete:</strong> ${escapeHtml(item.sorvete)}</span>` : ''}
+            ${item.acompanhamentos.length ? `<span><strong>Acompanhamentos:</strong> ${escapeHtml(item.acompanhamentos.join(', '))}</span>` : ''}
+            ${item.adicionais.length ? `<span><strong>Adicionais:</strong> ${escapeHtml(item.adicionais.join(', '))}</span>` : ''}
             ${item.calda ? `<span><strong>Calda:</strong> ${escapeHtml(item.calda)}</span>` : ''}
             <span>Qtd: ${item.qty}</span>
             <span>Subtotal: ${formatPrice(subtotal)}</span>
@@ -577,7 +695,7 @@ function finalizeOrder() {
 
     const orderContext = getOrderContext();
     if (!isOrderContextValid(orderContext)) {
-        alert('Preencha os dados do pedido em Delivery ou Pedir e retirar antes de finalizar.');
+        alert('Preencha os dados do pedido em Delivery ou Peça e retire antes de finalizar.');
         return;
     }
 
@@ -600,9 +718,9 @@ function finalizeOrder() {
         horarioRetirada: orderContext.horarioRetirada || '',
         dadosPedido: orderContext,
         total,
-        itens: cart.map((item) => `${item.qty || 1}x ${item.title}`),
+        itens: cart.map(formatCartItemLine),
         itensDetalhados: cart,
-        status: 'recebidos',
+        status: 'aguardando',
         criadoEm: new Date().toISOString(),
         atualizadoEm: new Date().toISOString()
     };
@@ -644,7 +762,8 @@ function openModal(product) {
     qtyValue.textContent = currentQty;
 
     const extrasContainer = document.getElementById('extras-container');
-    if (product.category === 'acai') {
+    resetAcaiOptions();
+    if (isAcaiProduct(product)) {
         extrasContainer.style.display = 'block';
     } else {
         extrasContainer.style.display = 'none';
@@ -664,13 +783,7 @@ function closeModal() {
     modal.setAttribute('aria-hidden', 'true');
     currentProduct = null;
 
-    document
-        .querySelectorAll('#extras-container input[type="checkbox"]')
-        .forEach((input) => {
-            input.checked = false;
-        });
-
-    document.getElementById('calda-select').selectedIndex = 0;
+    resetAcaiOptions();
 }
 
 if (productsContainer) {
@@ -712,7 +825,7 @@ document.addEventListener('keydown', (event) => {
         if (modal.classList.contains('active')) {
             closeModal();
         }
-        if (orderIntakeModal?.classList.contains('active')) {
+        if (orderIntakeModal.classList.contains('active')) {
             closeOrderIntakeModal();
         }
     }
@@ -725,6 +838,19 @@ if (modalClose) {
 if (modalOverlay) {
     modalOverlay.addEventListener('click', closeModal);
 }
+
+document.querySelectorAll('.acai-acompanhamento').forEach((input) => {
+    input.addEventListener('change', () => {
+        const selected = getAcaiSelectedAcompanhamentos();
+        if (selected.length > MAX_ACAI_ACOMPANHAMENTOS) {
+            input.checked = false;
+            updateAcaiCounter('Você pode escolher até 7 acompanhamentos.');
+            return;
+        }
+
+        updateAcaiCounter('');
+    });
+});
 
 if (qtyDecrease) {
     qtyDecrease.addEventListener('click', () => {
@@ -751,20 +877,24 @@ if (addToCartBtn) {
         let calda = '';
         let adicionaisValor = 0;
 
-        const isAcai = currentProduct.category === 'acai' ||
-            normalizeText(currentProduct.title).includes('acai');
+        const isAcai = isAcaiProduct(currentProduct);
+        let tamanho = '';
+        let sorvete = '';
 
         if (isAcai) {
-            acompanhamentos = [
-                ...document.querySelectorAll('#extras-container input:not(.adicional):checked')
-            ].map((item) => item.value);
+            acompanhamentos = getAcaiSelectedAcompanhamentos();
 
             calda = document.getElementById('calda-select').value;
 
             document.querySelectorAll('.adicional:checked').forEach((item) => {
-                adicionais.push(item.value);
-                adicionaisValor += Number(item.dataset.price);
+                const price = Number(item.dataset.price || 0);
+                adicionais.push(`${item.value} (+${formatPrice(price)})`);
+                adicionaisValor += price;
             });
+
+            const acaiDetails = getAcaiDetails(currentProduct.title);
+            tamanho = acaiDetails.tamanho;
+            sorvete = acaiDetails.sorvete;
         }
 
         const produtoFinal = {
@@ -772,14 +902,69 @@ if (addToCartBtn) {
             acompanhamentos,
             adicionais,
             calda,
+            tamanho,
+            sorvete,
             adicional: adicionaisValor
         };
 
         produtoFinal.price += adicionaisValor;
 
+        const productTitle = currentProduct.title;
+
         addToCart(produtoFinal, currentQty);
         closeModal();
 
-        alert(`${currentQty}x ${currentProduct.title} adicionado ao carrinho`);
+        alert(`${currentQty}x ${productTitle} adicionado ao carrinho`);
     });
 }
+
+function setupMenuCardReveal() {
+    const cards = document.querySelectorAll('section.main-cards .interface a');
+    if (!cards.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+        cards.forEach((card) => {
+            if (card.querySelector('.card-info')) {
+                card.classList.add('is-visible');
+            }
+        });
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            entry.target.classList.add('is-visible');
+            currentObserver.unobserve(entry.target);
+        });
+    }, {
+        threshold: 0.14,
+        rootMargin: '0px 0px -8% 0px'
+    });
+
+    cards.forEach((card, index) => {
+        if (!card.querySelector('.card-info') || card.dataset.scrollRevealReady === 'true') return;
+
+        card.dataset.scrollRevealReady = 'true';
+        card.classList.add('scroll-reveal');
+        card.style.transitionDelay = `${Math.min(index % 6, 5) * 45}ms`;
+        observer.observe(card);
+    });
+}
+
+setupMenuCardReveal();
+window.addEventListener('focus', setupMenuCardReveal);
+window.addEventListener('pageshow', setupMenuCardReveal);
+window.addEventListener('mk-promos-updated', setupMenuCardReveal);
+window.addEventListener('mk-products-updated', setupMenuCardReveal);
+window.addEventListener('storage', (event) => {
+    if (event.key === 'mk_promocoes' || event.key === 'mk_produtos') {
+        setupMenuCardReveal();
+    }
+});
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        setupMenuCardReveal();
+    }
+});

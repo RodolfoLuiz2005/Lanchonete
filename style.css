@@ -23,27 +23,46 @@ body {
 
 }
 
+body.menu-open {
+    overflow: hidden;
+}
+
 .interface {
     max-width: 1080px;
     margin: 0 auto;
 }
 
 header {
-    padding: 20px 4%;
+    padding: 24px 4% 42px;
     position: relative;
     z-index: 100;
-}
-
-header {
-    display: inline-block;
     width: 100%;
-    height: 100%;
-    background-image: linear-gradient(to bottom, var(--primary-color), var(--secondary-color), var(--terceira-cor));
-    opacity: 0.9;
-    background-size: contain;
+    height: 100vh;
+    min-height: clamp(340px, 48vw, 520px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background-image:
+        linear-gradient(135deg, rgba(34, 12, 2, 0.84) 0%, rgba(115, 44, 2, 0.72) 42%, rgba(217, 82, 4, 0.5) 100%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(31, 12, 3, 0.82)),
+        url("img/img-header.png");
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+    box-shadow: inset 0 -80px 80px rgba(115, 44, 2, 0.34);
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.35s ease;
+    will-change: opacity, transform;
+}
 
+header.is-loaded {
+    opacity: 1;
+    transform: none;
+}
+
+header.is-scrolled {
+    box-shadow: inset 0 -70px 78px rgba(115, 44, 2, 0.3), 0 18px 42px rgba(35, 12, 2, 0.2);
 }
 
 main {
@@ -55,6 +74,37 @@ main {
 }
 
 /* header */
+
+header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top left, rgba(217, 130, 24, 0.28), transparent 34%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42));
+    pointer-events: none;
+}
+
+header .interface {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+header > .interface > h1 {
+    color: #fff8ef;
+    font-size: clamp(2.15rem, 5vw, 4.35rem);
+    line-height: 1.05;
+    max-width: 760px;
+    margin: 44px auto 0;
+    padding: 22px 0 8px;
+    text-shadow: 0 5px 22px rgba(0, 0, 0, 0.58);
+    animation: headerTitleIn 0.85s ease both;
+}
+
+header.is-scrolled > .interface > h1 {
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
 
 h1 {
     font-size: 2.5rem;
@@ -73,21 +123,41 @@ h1 {
 
 header button {
 
-    padding: 10px 20px;
-    background-color: #ffffffdd;
-    color: #000;
-    border: none;
-    border-radius: 5px;
+    padding: 13px 22px;
+    background: linear-gradient(135deg, #fff8ec 0%, #ffd08d 100%);
+    color: #3a1602;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 12px;
     cursor: pointer;
     font-size: 1rem;
-    transition: transform 0.3s ease;
-    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.47);
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 12px 26px rgba(47, 18, 2, 0.32);
+}
+
+header button::after {
+    content: "";
+    position: absolute;
+    inset: -80% -35%;
+    background: linear-gradient(120deg, transparent 42%, rgba(255, 255, 255, 0.38) 50%, transparent 58%);
+    transform: translateX(-75%) rotate(8deg);
+    opacity: 0;
+    transition: transform 0.55s ease, opacity 0.35s ease;
+    pointer-events: none;
 }
 
 
 header button:hover {
-    transform: scale(1.03);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 16px 34px rgba(47, 18, 2, 0.38);
 
+}
+
+header button:hover::after {
+    opacity: 1;
+    transform: translateX(75%) rotate(8deg);
 }
 
 header button:active {
@@ -95,11 +165,48 @@ header button:active {
     border: solid 3px var(--primary-color);
 }
 
+.i-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    animation: headerActionsIn 0.75s ease 0.18s both;
+}
+
 /* menu */
 
+.btn-abrir,
+.btn-carrinho {
+    width: 52px;
+    height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(255, 248, 236, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    animation: headerIconIn 0.7s ease both;
+}
+
+.btn-carrinho {
+    animation-delay: 0.08s;
+}
+
+.btn-abrir:hover,
+.btn-carrinho:hover {
+    background: #fff8ec;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.32);
+    border-color: rgba(255, 208, 141, 0.72);
+}
+
 .btn-abrir i {
-    color: rgba(0, 0, 0, 0.79);
-    font-size: 40px;
+    color: var(--primary-color);
+    font-size: 34px;
     cursor: pointer;
 
 
@@ -110,8 +217,8 @@ header button:active {
 }
 
 .btn-carrinho i {
-    color: rgba(0, 0, 0, 0.79);
-    font-size: 40px;
+    color: var(--primary-color);
+    font-size: 31px;
     cursor: pointer;
 
 }
@@ -137,54 +244,128 @@ header button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    padding: 0;
+    transition: top 0.28s ease, padding 0.28s ease, background 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, backdrop-filter 0.28s ease, transform 0.28s ease;
+}
+
+header.is-scrolled .i-header {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    width: min(1080px, calc(100% - 28px));
+    padding: 8px 10px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(255, 208, 141, 0.28);
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(59, 23, 4, 0.72), rgba(115, 44, 2, 0.54));
+    backdrop-filter: blur(16px) saturate(1.18);
+    box-shadow: 0 14px 34px rgba(22, 7, 1, 0.28);
+    z-index: 999;
+}
+
+header.is-scrolled .btn-abrir,
+header.is-scrolled .btn-carrinho {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
 }
 
 
 .menu {
-    background-color: #000;
+    background: linear-gradient(180deg, rgba(19, 8, 2, 0.96), rgba(53, 19, 2, 0.94));
     height: 100vh;
     position: fixed;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px);
     top: 0;
     left: 0;
     z-index: 999999;
-    width: 0;
+    width: min(360px, 82vw);
     overflow: hidden;
-    transition: .5s;
+    transform: translateX(-104%);
+    opacity: 0;
+    visibility: hidden;
+    border-right: 1px solid rgba(255, 208, 141, 0.2);
+    box-shadow: 18px 0 42px rgba(0, 0, 0, 0);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, visibility 0.42s ease, box-shadow 0.42s ease;
+    will-change: transform, opacity;
 
 }
 
 
 .menu.abrir-menu  {
-    width: 70%;
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    box-shadow: 18px 0 42px rgba(0, 0, 0, 0.34);
 
 }
 
 .menu.abrir-menu ~ .overlay-menu {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .menu nav ul {
     text-align: left;
+    opacity: 0;
+    transform: translateX(-12px);
+    transition: opacity 0.34s ease, transform 0.34s ease;
 
+}
 
+.menu.abrir-menu nav ul {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.menu.abrir-menu nav ul:nth-child(2) {
+    transition-delay: 0.04s;
+}
+
+.menu.abrir-menu nav ul:nth-child(3) {
+    transition-delay: 0.08s;
+}
+
+.menu.abrir-menu nav ul:nth-child(4) {
+    transition-delay: 0.12s;
 }
 
 .menu nav ul li a {
     color: #fff;
     font-size: 20px;
-    font-weight: 300;
+    font-weight: 500;
     cursor: pointer;
-    padding: 40px 4%;
+    padding: 22px 8%;
     display: block;
     text-decoration: none;
-    transform: scale(1.04);
+    position: relative;
+    letter-spacing: 0;
+    transition: color 0.24s ease, background 0.24s ease, transform 0.24s ease;
 }
 
 .menu nav ul li a:hover {
-    background-color: var(--secondary-color);
-    color: #000;
-    transition: .5s ease;
+    background: rgba(217, 130, 24, 0.14);
+    color: #ffd08d;
+    transform: translateX(6px);
+}
+
+.menu nav ul li a::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 88%;
+    bottom: 14px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--terceira-cor), var(--secondary-color));
+    transition: right 0.28s ease;
+}
+
+.menu nav ul li a:hover::after {
+    right: 8%;
 }
 
 .overlay-menu {
@@ -195,7 +376,10 @@ header button:active {
     top: 0;
     left: 0;
     z-index: 88899;
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.32s ease, visibility 0.32s ease;
 }
 
 .menu .btn-fechar {
@@ -210,7 +394,13 @@ header button:active {
     font-size: 30px;
     padding: 20px;
     cursor: pointer;
+    transition: color 0.24s ease, transform 0.24s ease;
 
+}
+
+.menu .btn-fechar i:hover {
+    color: #ffd08d;
+    transform: rotate(90deg) scale(1.05);
 }
 
 .dentro-menu {
@@ -223,6 +413,14 @@ header button:active {
     font-size: 2rem;
     color: var(--terceira-cor);
     margin: 0% 4%;
+    transform-origin: left center;
+    animation: logoSoftIn 0.8s ease both;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.dentro-menu h1:hover {
+    color: #ffd08d;
+    transform: scale(1.03);
 }
 
 hr {
@@ -382,27 +580,29 @@ section.main-cards .interface a {
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
-    background-color: #fcfafae7;
+    background: linear-gradient(135deg, #fffaf1 0%, #fff1dc 100%);
     padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.094);
+    border: 1px solid rgba(217, 130, 24, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(42, 16, 2, 0.12);
     text-decoration: none;
     color: #000;
-    transform: scale(1.05);
+    transform: translateY(0) scale(1);
     position: relative;
     z-index: 1;
    
 }
 section.main-cards .interface a{
-    transition: .5s ease;
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease, opacity 0.55s ease;
 }
 section.main-cards .interface a:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 15px #0000000c;
+    transform: translateY(-5px) scale(1.012);
+    border-color: rgba(217, 82, 4, 0.32);
+    box-shadow: 0 16px 30px rgba(42, 16, 2, 0.2);
 }
 section.main-cards .interface a:active {
-    transform: scale(1.03);
-    box-shadow: 0 0 5px #0000000c;
+    transform: translateY(-2px) scale(0.995);
+    box-shadow: 0 8px 18px rgba(42, 16, 2, 0.14);
 }
 
 section.main-cards .interface h2{
@@ -413,8 +613,10 @@ section.main-cards .interface h2{
 
 section.main-cards .interface a img {
     width: 150px;
-    height: auto;
+    height: 118px;
     border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 section.main-cards .interface a hr {
     width: 100%;
@@ -436,7 +638,7 @@ section.main-cards .interface a h4{
     color: var(--terceira-cor);
 }
 
-/* Promocoes (produtos vindos do painel admin) */
+/* Promoes (produtos vindos do painel admin) */
 section.main-cards .interface h2[data-admin-promocoes="true"] {
     color: #fff6e8;
     font-size: 1.7rem;
@@ -516,7 +718,7 @@ section.main-cards .interface a.produto-destaque-admin[data-admin-promocoes="tru
 }
 
 section.main-cards .interface a[data-admin-promocoes="true"]:hover {
-    transform: scale(1.03);
+    transform: translateY(-5px) scale(1.012);
 }
 
 @media (max-width: 560px) {
@@ -650,6 +852,20 @@ section.main-cards .interface a[data-admin-promocoes="true"]:hover {
 .extras-container h3 {
     margin: 15px 0 10px;
     color: var(--primary-color);
+}
+
+.acai-counter {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.acai-warning {
+    min-height: 18px;
+    color: #b04300;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 .extras-container select {
@@ -944,4 +1160,166 @@ section.main-cards .interface a[data-admin-promocoes="true"]:hover {
 .order-intake-actions .back {
     background: #ececec;
     color: #000;
+}
+
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(26px) scale(0.98);
+}
+
+.scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+section.main-cards .interface a.scroll-reveal.is-visible:hover {
+    transform: translateY(-5px) scale(1.012);
+}
+
+@keyframes headerTitleIn {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes headerActionsIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes headerIconIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes logoSoftIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        min-height: 430px;
+        padding: 18px 5% 36px;
+        background-position: center;
+    }
+
+    header > .interface > h1 {
+        margin-top: 52px;
+        max-width: 560px;
+    }
+
+    .btn-abrir,
+    .btn-carrinho {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+    }
+
+    header.is-scrolled .i-header {
+        top: 10px;
+        width: calc(100% - 22px);
+        padding: 7px 8px;
+        border-radius: 18px;
+    }
+
+    header.is-scrolled .btn-abrir,
+    header.is-scrolled .btn-carrinho {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 560px) {
+    header {
+        min-height: 440px;
+        padding-bottom: 32px;
+    }
+
+    header > .interface > h1 {
+        margin-top: 46px;
+        padding-inline: 6px;
+    }
+
+    header button {
+        width: min(100%, 260px);
+        justify-content: center;
+    }
+
+    header.is-scrolled .i-header {
+        top: 8px;
+        width: calc(100% - 18px);
+        border-radius: 16px;
+    }
+
+    .i-botoes {
+        width: 100%;
+    }
+
+    .menu {
+        width: min(330px, 86vw);
+    }
+
+    .menu nav ul li a {
+        padding: 20px 9%;
+        font-size: 18px;
+    }
+
+    section.main-cards .interface a {
+        gap: 12px;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    section.main-cards .interface a img {
+        width: 112px;
+        height: 102px;
+    }
+
+    section.main-cards .interface a p {
+        font-size: 0.9rem;
+    }
+
+    section.main-cards .interface a h4 {
+        text-align: left;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .scroll-reveal {
+        opacity: 1;
+        transform: none;
+    }
 }

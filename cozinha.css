@@ -19,6 +19,89 @@ body {
     min-height: 100vh
 }
 
+body.kitchen-locked .kitchen-top,
+body.kitchen-locked .kitchen-board {
+    display: none
+}
+
+.kitchen-login {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+        linear-gradient(135deg, rgba(29, 13, 6, .92), rgba(115, 44, 2, .82)),
+        radial-gradient(circle at top left, rgba(217, 130, 24, .28), transparent 34%)
+}
+
+body.kitchen-locked .kitchen-login {
+    display: flex
+}
+
+.kitchen-login-card {
+    width: min(420px, 100%);
+    background: #fff7f0;
+    border: 1px solid rgba(217, 130, 24, .24);
+    border-radius: 22px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .34);
+    padding: 28px;
+    color: #2d160b
+}
+
+.kitchen-login-card span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    font-size: .75rem;
+    color: var(--secondary);
+    font-weight: 900;
+    margin-bottom: 8px
+}
+
+.kitchen-login-card h1 {
+    color: var(--primary);
+    font-size: clamp(1.8rem, 5vw, 2.3rem);
+    margin-bottom: 22px
+}
+
+.kitchen-login-card label {
+    display: grid;
+    gap: 8px;
+    color: #5f2d14;
+    font-weight: 800;
+    margin-bottom: 14px
+}
+
+.kitchen-login-card input {
+    width: 100%;
+    border: 1px solid rgba(115, 44, 2, .2);
+    border-radius: 12px;
+    padding: 13px 14px;
+    font-size: 1rem;
+    color: #2d160b;
+    background: #fff
+}
+
+.kitchen-login-card input:focus {
+    outline: 3px solid rgba(217, 130, 24, .22);
+    border-color: var(--secondary)
+}
+
+.kitchen-login-error {
+    min-height: 22px;
+    color: #b91c1c;
+    font-size: .95rem;
+    font-weight: 800;
+    margin: 4px 0 16px
+}
+
+.kitchen-login-card button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--secondary), var(--third));
+    box-shadow: 0 12px 24px rgba(217, 82, 4, .22)
+}
+
 .kitchen-top {
     position: sticky;
     top: 0;
@@ -73,7 +156,7 @@ a {
 
 .kitchen-board {
     display: grid;
-    grid-template-columns: repeat(5, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, minmax(240px, 1fr));
     gap: 16px;
     padding: 18px;
     overflow-x: auto
@@ -197,7 +280,7 @@ a {
 
 @media(max-width:1100px) {
     .kitchen-board {
-        grid-template-columns: repeat(5, 280px)
+        grid-template-columns: repeat(4, 280px)
     }
 }
 

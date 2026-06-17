@@ -46,28 +46,28 @@
   }
 
   const produtosPadrao = [
-    makeDefaultProduct('produto-pizza-calabresa', 'Calabresa', 'Molho de tomate, mussarela, calabresa, cebola, azeitonas e oregano.', 41.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-portuguesa', 'Portuguesa', 'Molho de tomate, mussarela, ovo, presunto, calabresa, tomate, milho, ervilha, pimentao, azeitona e oregano.', 49.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-frango', 'Frango', 'Molho de tomate, mussarela, frango, azeitona e oregano.', 44.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-mk', 'MK', 'Molho de tomate, mussarela, camarao, portuguesa, calabresa, frango, tomate, azeitona e oregano.', 58.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-camarao', 'Camarao', 'Molho de tomate, mussarela, camarao, catupiry, azeitona e oregano.', 68.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-luiz-gonzaga', 'Luiz Gonzaga', 'Molho de tomate, mussarela, charque desfiada, carne de sol desfiada, bacon, cebola e oregano.', 68.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-calabresa', 'Calabresa', 'Molho de tomate, mussarela, calabresa, cebola, azeitonas e orégano.', 41.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-portuguesa', 'Portuguesa', 'Molho de tomate, mussarela, ovo, presunto, calabresa, tomate, milho, ervilha, pimentão, azeitona e orégano.', 49.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-frango', 'Frango', 'Molho de tomate, mussarela, frango, azeitona e orégano.', 44.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-mk', 'MK', 'Molho de tomate, mussarela, camarão, portuguesa, calabresa, frango, tomate, azeitona e orégano.', 58.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-camarao', 'Camarão', 'Molho de tomate, mussarela, camarão, catupiry, azeitona e orégano.', 68.99, 'Pizza'),
+    makeDefaultProduct('produto-pizza-luiz-gonzaga', 'Luiz Gonzaga', 'Molho de tomate, mussarela, charque desfiada, carne de sol desfiada, bacon, cebola e orégano.', 68.99, 'Pizza'),
 
     makeDefaultProduct('produto-doce-chocolate', 'Chocolate', 'Mussarela, chocolate derretido e M&M.', 33.99, 'Doces'),
-    makeDefaultProduct('produto-doce-banana', 'Banana', 'Mussarela, banana, acucar e canela.', 33.99, 'Doces'),
+    makeDefaultProduct('produto-doce-banana', 'Banana', 'Mussarela, banana, açúcar e canela.', 33.99, 'Doces'),
     makeDefaultProduct('produto-doce-romeu-julieta', 'Romeu e Julieta', 'Mussarela, goiabada e queijo minas.', 68.99, 'Doces'),
 
-    makeDefaultProduct('produto-hamb-tradicional', 'Tradicional', 'Pao, carne, creme de milho, tomate e cebola caramelizada.', 18.99, 'Hamburguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-burguer', 'X-Burguer', 'Pao, carne, queijo, alface, tomate e maionese.', 22.99, 'Hamburguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-bacon', 'X-Bacon', 'Pao, carne, queijo, bacon crocante, alface, tomate e maionese.', 26.99, 'Hamburguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-tudo', 'X-Tudo', 'Pao, carne, queijo, bacon, ovo, presunto, alface, tomate e maionese.', 32.99, 'Hamburguer Tradicional'),
-    makeDefaultProduct('produto-hamb-duplo', 'Duplo', 'Pao, dois hamburgueres, queijo duplo, alface, tomate e molho especial.', 36.99, 'Hamburguer Tradicional'),
+    makeDefaultProduct('produto-hamb-tradicional', 'Tradicional', 'Pão, carne, creme de milho, tomate e cebola caramelizada.', 18.99, 'Hambúrguer Tradicional'),
+    makeDefaultProduct('produto-hamb-x-burguer', 'X-Burguer', 'Pão, carne, queijo, alface, tomate e maionese.', 22.99, 'Hambúrguer Tradicional'),
+    makeDefaultProduct('produto-hamb-x-bacon', 'X-Bacon', 'Pão, carne, queijo, bacon crocante, alface, tomate e maionese.', 26.99, 'Hambúrguer Tradicional'),
+    makeDefaultProduct('produto-hamb-x-tudo', 'X-Tudo', 'Pão, carne, queijo, bacon, ovo, presunto, alface, tomate e maionese.', 32.99, 'Hambúrguer Tradicional'),
+    makeDefaultProduct('produto-hamb-duplo', 'Duplo', 'Pão, dois hambúrgueres, queijo duplo, alface, tomate e molho especial.', 36.99, 'Hambúrguer Tradicional'),
 
-    makeDefaultProduct('produto-gourmet-smash-classico', 'Smash Classico', 'Pao brioche, blend artesanal, cebola caramelizada, queijo gouda e maionese trufada.', 42.99, 'Hamburguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-bbq-bacon', 'BBQ Bacon', 'Pao brioche, blend artesanal, bacon crispy, queijo cheddar, molho BBQ e cebola crispy.', 48.99, 'Hamburguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-cogumelos', 'Cogumelos', 'Pao brioche, blend artesanal, cogumelos salteados, queijo brie, rucula e aioli de alho.', 52.99, 'Hamburguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-big-mac-1', 'Big Mac', 'Pao com gergelim, dois hamburgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hamburguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-big-mac-2', 'Big Mac', 'Pao com gergelim, dois hamburgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hamburguer Gourmet', gourmetImage),
+    makeDefaultProduct('produto-gourmet-smash-classico', 'Smash Clássico', 'Pão brioche, blend artesanal, cebola caramelizada, queijo gouda e maionese trufada.', 42.99, 'Hambúrguer Gourmet', gourmetImage),
+    makeDefaultProduct('produto-gourmet-bbq-bacon', 'BBQ Bacon', 'Pão brioche, blend artesanal, bacon crispy, queijo cheddar, molho BBQ e cebola crispy.', 48.99, 'Hambúrguer Gourmet', gourmetImage),
+    makeDefaultProduct('produto-gourmet-cogumelos', 'Cogumelos', 'Pão brioche, blend artesanal, cogumelos salteados, queijo brie, rúcula e aioli de alho.', 52.99, 'Hambúrguer Gourmet', gourmetImage),
+    makeDefaultProduct('produto-gourmet-big-mac-1', 'Big Mac', 'Pão com gergelim, dois hambúrgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hambúrguer Gourmet', gourmetImage),
+    makeDefaultProduct('produto-gourmet-big-mac-2', 'Big Mac', 'Pão com gergelim, dois hambúrgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hambúrguer Gourmet', gourmetImage),
 
     makeDefaultProduct('produto-sorvete-casquinha', 'Casquinha Tradicional', 'Casquinha crocante com sorvete de creme, chocolate ou morango.', 6.99, 'Sorvete'),
     makeDefaultProduct('produto-sorvete-sundae', 'Sundae', 'Sorvete de baunilha com calda de caramelo ou chocolate.', 12.99, 'Sorvete'),
@@ -75,17 +75,29 @@
     makeDefaultProduct('produto-sorvete-copa', 'Copa de Sorvete', 'Copa com duas bolas de sorvete a escolha, calda e granulado.', 15.99, 'Sorvete'),
     makeDefaultProduct('produto-sorvete-especial', 'Sorvete Especial', 'Sorvete artesanal com mix de frutas vermelhas e chantilly.', 22.99, 'Sorvete'),
 
-    makeDefaultProduct('produto-acai-400-sem-sorvete', 'Acai 400ML S/Sorvete', '', 11.99, 'Acai'),
-    makeDefaultProduct('produto-acai-400-com-sorvete', 'Acai 400ML C/Sorvete', '', 14.99, 'Acai'),
-    makeDefaultProduct('produto-acai-600-sem-sorvete', 'Acai 600ML S/Sorvete', '', 14.99, 'Acai'),
-    makeDefaultProduct('produto-acai-600-com-sorvete', 'Acai 600ML C/Sorvete', '', 17.99, 'Acai'),
+    makeDefaultProduct('produto-acai-400-sem-sorvete', 'Açaí 400ML S/Sorvete', '', 11.99, 'Açaí'),
+    makeDefaultProduct('produto-acai-400-com-sorvete', 'Açaí 400ML C/Sorvete', '', 14.99, 'Açaí'),
+    makeDefaultProduct('produto-acai-600-sem-sorvete', 'Açaí 600ML S/Sorvete', '', 14.99, 'Açaí'),
+    makeDefaultProduct('produto-acai-600-com-sorvete', 'Açaí 600ML C/Sorvete', '', 17.99, 'Açaí'),
 
-    makeDefaultProduct('produto-bebida-refrigerante-lata', 'Refrigerante Lata', 'Coca-Cola, Guarana, Sprite ou Fanta lata 350ml gelada.', 6.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-suco-natural', 'Suco Natural', 'Suco natural de laranja, limao, maracuja ou abacaxi copo 400ml.', 10.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-agua-mineral', 'Agua Mineral', 'Agua mineral sem gas ou com gas garrafa 500ml.', 4.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-cha-gelado', 'Cha Gelado', 'Cha gelado de pessego, limao ou maca copo 400ml.', 8.99, 'Bebidas'),
+    makeDefaultProduct('produto-bebida-refrigerante-lata', 'Refrigerante Lata', 'Coca-Cola, Guaraná, Sprite ou Fanta lata 350ml gelada.', 6.99, 'Bebidas'),
+    makeDefaultProduct('produto-bebida-suco-natural', 'Suco Natural', 'Suco natural de laranja, limão, maracujá ou abacaxi copo 400ml.', 10.99, 'Bebidas'),
+    makeDefaultProduct('produto-bebida-agua-mineral', 'Água Mineral', 'Água mineral sem gás ou com gás garrafa 500ml.', 4.99, 'Bebidas'),
+    makeDefaultProduct('produto-bebida-cha-gelado', 'Chá Gelado', 'Chá gelado de pêssego, limão ou maçã copo 400ml.', 8.99, 'Bebidas'),
     makeDefaultProduct('produto-bebida-vitamina-frutas', 'Vitamina de Frutas', 'Vitamina cremosa de banana com morango, manga ou abacate 400ml.', 13.99, 'Bebidas')
   ];
+
+  const produtosObrigatoriosCardapio = new Set([
+    'produto-acai-400-sem-sorvete',
+    'produto-acai-400-com-sorvete',
+    'produto-acai-600-sem-sorvete',
+    'produto-acai-600-com-sorvete',
+    'produto-bebida-refrigerante-lata',
+    'produto-bebida-suco-natural',
+    'produto-bebida-agua-mineral',
+    'produto-bebida-cha-gelado',
+    'produto-bebida-vitamina-frutas'
+  ]);
 
   const promoStyles = ['desconto', 'combo', 'clone', 'destaque'];
 
@@ -109,11 +121,17 @@
 
   function normalizeCategory(value){
     const category = normalizeText(value);
+    if (normalizeForMatch(category) === 'acai') return 'Açaí';
     return category || 'Outros';
   }
 
   function normalizeProductOrigin(value){
     return value === 'padrao' ? 'padrao' : 'admin';
+  }
+
+  function isOutroProductName(value){
+    const name = normalizeForMatch(value);
+    return name === 'outro' || name === 'outros';
   }
 
   function normalizePromoStyle(value){
@@ -159,7 +177,9 @@
 
   function normalizeProductsList(list){
     const raw = Array.isArray(list) ? list : [];
-    return raw.map(normalizeProduct);
+    return raw
+      .map(normalizeProduct)
+      .filter((product) => !isOutroProductName(product.nome));
   }
 
   function normalizePromo(raw){
@@ -182,6 +202,34 @@
   function normalizePromosList(list){
     const raw = Array.isArray(list) ? list : [];
     return raw.map(normalizePromo);
+  }
+
+  function normalizeOrder(raw){
+    const src = raw && typeof raw === 'object' ? raw : null;
+    if (!src) return null;
+    const createdAt = src.criadoEm || src.data || todayISO();
+    const itens = Array.isArray(src.itens)
+      ? src.itens
+      : (src.itens ? [String(src.itens)] : []);
+
+    return {
+      ...src,
+      id: String(src.id || uid('PED')),
+      codigo: src.codigo || src.id || uid('MK'),
+      cliente: normalizeText(src.cliente) || 'Cliente',
+      status: normalizeText(src.status) || 'aguardando',
+      total: toNumber(src.total, 0),
+      itens,
+      itensDetalhados: Array.isArray(src.itensDetalhados) ? src.itensDetalhados : [],
+      dadosPedido: src.dadosPedido && typeof src.dadosPedido === 'object' ? src.dadosPedido : {},
+      criadoEm: createdAt,
+      atualizadoEm: src.atualizadoEm || createdAt
+    };
+  }
+
+  function normalizeOrdersList(list){
+    const raw = Array.isArray(list) ? list : [];
+    return raw.map(normalizeOrder).filter(Boolean);
   }
 
   function syncDefaultProducts(){
@@ -240,12 +288,36 @@
       deduped.push(normalized);
     });
 
+    const defaultsById = new Map(produtosPadrao.map((product) => [String(product.id), normalizeProduct(product)]));
+    deduped.forEach((product) => {
+      const defaultProduct = defaultsById.get(String(product.id));
+      if (!defaultProduct || !produtosObrigatoriosCardapio.has(String(product.id))) return;
+
+      if (
+        product.nome !== defaultProduct.nome ||
+        product.descricao !== defaultProduct.descricao ||
+        Number(product.preco) !== Number(defaultProduct.preco) ||
+        product.categoria !== defaultProduct.categoria ||
+        product.disponivel === false
+      ) {
+        changed = true;
+      }
+
+      product.nome = defaultProduct.nome;
+      product.descricao = defaultProduct.descricao;
+      product.preco = defaultProduct.preco;
+      product.categoria = defaultProduct.categoria;
+      product.disponivel = true;
+      product.origem = product.origem || defaultProduct.origem;
+      product.atualizadoEm = todayISO();
+    });
+
     if (changed || deduped.length !== normalizedStored.length) {
       write(STORAGE_KEYS.products, deduped);
       return;
     }
 
-    write(STORAGE_KEYS.products, normalizedStored);
+    write(STORAGE_KEYS.products, deduped);
   }
 
   function seed(){
@@ -258,7 +330,7 @@
 
     const legacyConfig = read(STORAGE_KEYS.config, {});
     const countFromLegacy = normalizeTableCount(
-      legacyConfig?.quantidadeMesas ?? legacyConfig?.mesas ?? DEFAULT_TABLES
+      legacyConfig.quantidadeMesas ?? legacyConfig.mesas ?? DEFAULT_TABLES
     );
 
     if(!localStorage.getItem(STORAGE_KEYS.systemConfig)) {
@@ -267,7 +339,7 @@
 
     const currentSystemConfig = read(STORAGE_KEYS.systemConfig, {});
     const finalCount = normalizeTableCount(
-      currentSystemConfig?.quantidadeMesas ?? countFromLegacy
+      currentSystemConfig.quantidadeMesas ?? countFromLegacy
     );
 
     if(!localStorage.getItem(STORAGE_KEYS.config)) {
@@ -277,15 +349,15 @@
     }
 
     if(!localStorage.getItem(STORAGE_KEYS.adminPassword)) {
-      const legacyPassword = normalizeText(legacyConfig?.senha);
+      const legacyPassword = normalizeText(legacyConfig.senha);
       write(STORAGE_KEYS.adminPassword, legacyPassword || DEFAULT_ADMIN_PASSWORD);
     }
 
     if(!localStorage.getItem(STORAGE_KEYS.adminConfig)) {
       const legacyPassword = normalizeText(read(STORAGE_KEYS.adminPassword, ''));
       const legacyAuthConfig = {
-        usuario: normalizeText(legacyConfig?.usuario) || DEFAULT_ADMIN_USERNAME,
-        senha: normalizeText(legacyConfig?.senha) || legacyPassword || DEFAULT_ADMIN_PASSWORD
+        usuario: normalizeText(legacyConfig.usuario) || DEFAULT_ADMIN_USERNAME,
+        senha: normalizeText(legacyConfig.senha) || legacyPassword || DEFAULT_ADMIN_PASSWORD
       };
       write(STORAGE_KEYS.adminConfig, normalizeAdminConfig(legacyAuthConfig));
     }
@@ -325,10 +397,14 @@
     window.dispatchEvent(new Event('mk-promos-updated'));
   }
 
-  function orders(){ return read(STORAGE_KEYS.orders, []); }
+  function orders(){
+    const list = normalizeOrdersList(read(STORAGE_KEYS.orders, []));
+    write(STORAGE_KEYS.orders, list);
+    return list;
+  }
 
   function saveOrders(list){
-    write(STORAGE_KEYS.orders, list);
+    write(STORAGE_KEYS.orders, normalizeOrdersList(list));
     window.dispatchEvent(new Event('mk-orders-updated'));
   }
 
@@ -336,7 +412,7 @@
     const legacy = read(STORAGE_KEYS.config, {});
     const system = read(STORAGE_KEYS.systemConfig, {});
     const quantidadeMesas = normalizeTableCount(
-      system?.quantidadeMesas ?? legacy?.quantidadeMesas ?? legacy?.mesas ?? DEFAULT_TABLES
+      system.quantidadeMesas ?? legacy.quantidadeMesas ?? legacy.mesas ?? DEFAULT_TABLES
     );
     return { ...legacy, quantidadeMesas, mesas: quantidadeMesas };
   }
@@ -344,7 +420,7 @@
   function saveConfig(cfg){
     const currentLegacy = read(STORAGE_KEYS.config, {});
     const quantidadeMesas = normalizeTableCount(
-      cfg?.quantidadeMesas ?? cfg?.mesas ?? currentLegacy?.quantidadeMesas ?? currentLegacy?.mesas ?? DEFAULT_TABLES
+      cfg.quantidadeMesas ?? cfg.mesas ?? currentLegacy.quantidadeMesas ?? currentLegacy.mesas ?? DEFAULT_TABLES
     );
     write(STORAGE_KEYS.systemConfig, { quantidadeMesas });
     write(STORAGE_KEYS.config, { ...currentLegacy, ...cfg, quantidadeMesas, mesas: quantidadeMesas });
@@ -407,7 +483,7 @@
       topMap[key] = (topMap[key] || 0) + Number(i.qty || 1);
     }));
     const top = Object.entries(topMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    return {today,week,month, faturamentoHoje:sum(today), faturamentoSemana:sum(week), faturamentoMes:sum(month), pedidosHoje:today.length, ticketMedio: today.length ? sum(today)/today.length : 0, top};
+    return {today,week,month, faturamentoHoje:sum(today), faturamentoSemana:sum(week), faturamentoMes:sum(month), pedidosHoje:today.length, ticketMedio: today.length ? sum(today) / today.length : 0, top};
   }
 
   function notifyClient(order, message){

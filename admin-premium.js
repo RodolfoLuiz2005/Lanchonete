@@ -14,10 +14,10 @@ const money = (v) => MKStore.BRL.format(Number(v || 0));
 const pages = {
   dashboard: 'Dashboard',
   produtos: 'Produtos',
-  promocoes: 'Promocoes',
+  promocoes: 'Promoções',
   pedidos: 'Pedidos',
   mesas: 'Mesas / QR Code',
-  config: 'Configuracoes'
+  config: 'Configurações'
 };
 const DEFAULT_TABLES_COUNT = 10;
 
@@ -25,10 +25,10 @@ const PRODUCT_IMAGE_PLACEHOLDER = 'img/hamb.gourmet.jpg';
 const DEFAULT_PRODUCT_CATEGORIES = [
   'Pizza',
   'Doces',
-  'Hamburguer Tradicional',
-  'Hamburguer Gourmet',
+  'Hambúrguer Tradicional',
+  'Hambúrguer Gourmet',
   'Sorvete',
-  'Acai',
+  'Açaí',
   'Bebidas',
   'Outros'
 ];
@@ -70,7 +70,24 @@ function escapeJsString(value) {
 
 function normalizeCategory(value) {
   const category = normalizeText(value);
+  if (category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'acai') {
+    return 'Açaí';
+  }
   return category || 'Outros';
+}
+
+function normalizeForMatch(value) {
+  return normalizeText(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function isOutroProductName(value) {
+  const name = normalizeForMatch(value);
+  return name === 'outro' || name === 'outros';
 }
 
 function refreshProductCategoryOptions(selectedValue = 'Outros') {
@@ -87,8 +104,13 @@ function refreshProductCategoryOptions(selectedValue = 'Outros') {
   productCategorySelect.value = normalizeCategory(selectedValue);
 }
 
+function safeOrder(order) {
+  return order && typeof order === 'object' ? order : {};
+}
+
 function orderType(order) {
-  return order?.tipoPedido || order?.tipo || 'retirada';
+  const item = safeOrder(order);
+  return item.tipoPedido || item.tipo || 'retirada';
 }
 
 function typeLabel(order) {
@@ -100,23 +122,28 @@ function typeLabel(order) {
 }
 
 function orderInfo(order) {
-  return order?.dadosPedido || {};
+  const item = safeOrder(order);
+  return item.dadosPedido && typeof item.dadosPedido === 'object' ? item.dadosPedido : {};
 }
 
 function orderPhone(order) {
-  return order.telefone || orderInfo(order).telefone || '';
+  const item = safeOrder(order);
+  return item.telefone || orderInfo(item).telefone || '';
 }
 
 function orderTable(order) {
-  return order.mesa || orderInfo(order).numeroMesa || '';
+  const item = safeOrder(order);
+  return item.mesa || orderInfo(item).numeroMesa || '';
 }
 
 function orderPickupTime(order) {
-  return orderInfo(order).horarioRetirada || order.horarioRetirada || '';
+  const item = safeOrder(order);
+  return orderInfo(item).horarioRetirada || item.horarioRetirada || '';
 }
 
 function orderNotes(order) {
-  return orderInfo(order).observacaoPedido || orderInfo(order).observacao || order.observacao || '';
+  const item = safeOrder(order);
+  return orderInfo(item).observacaoPedido || orderInfo(item).observacao || item.observacao || '';
 }
 
 function formatAddress(order) {
@@ -129,7 +156,7 @@ function formatAddress(order) {
     if (linha) return linha;
     if (extra) return extra;
   }
-  return order.endereco || '';
+  return safeOrder(order).endereco || '';
 }
 
 function orderDetailsHtml(order) {
@@ -141,7 +168,7 @@ function orderDetailsHtml(order) {
 
   if (tipo === 'delivery') {
     const endereco = formatAddress(order);
-    if (endereco) detalhes.push(`<small>Endereco: ${escapeHtml(endereco)}</small>`);
+    if (endereco) detalhes.push(`<small>Endereço: ${escapeHtml(endereco)}</small>`);
   }
 
   if (tipo === 'retirada') {
@@ -155,7 +182,14 @@ function orderDetailsHtml(order) {
   return detalhes.join('<br>');
 }
 
+function orderItemsHtml(order) {
+  const items = Array.isArray(order.itens) ? order.itens : [];
+  if (!items.length) return '';
+  return `<br><small>Itens: ${items.map(escapeHtml).join(' | ')}</small>`;
+}
+
 function buildOrderPrintText(order) {
+  const item = safeOrder(order);
   const tipo = orderType(order);
   const mesa = orderTable(order);
   const phone = orderPhone(order);
@@ -165,20 +199,20 @@ function buildOrderPrintText(order) {
 
   const lines = [
     '========================',
-    `Pedido #${order.codigo || order.id}`,
+    `Pedido #${item.codigo || item.id || ''}`,
     `Tipo: ${typeLabel(order)}${mesa ? ` | Mesa ${mesa}` : ''}`,
-    `Cliente: ${order.cliente || 'Cliente'}`
+    `Cliente: ${item.cliente || 'Cliente'}`
   ];
 
   if (phone) lines.push(`Telefone: ${phone}`);
-  if (tipo === 'delivery' && endereco) lines.push(`Endereco: ${endereco}`);
+  if (tipo === 'delivery' && endereco) lines.push(`Endereço: ${endereco}`);
   if (tipo === 'retirada' && retirada) lines.push(`Retirada: ${retirada}`);
   if (obs) lines.push(`Obs: ${obs}`);
 
   lines.push('------------------------');
-  lines.push(...(order.itens || []));
+  lines.push(...(Array.isArray(item.itens) ? item.itens : []));
   lines.push('------------------------');
-  lines.push(`Total: ${money(order.total)}`);
+  lines.push(`Total: ${money(item.total)}`);
   lines.push('========================');
 
   return lines.join('\n');
@@ -236,7 +270,7 @@ function renderDashboard() {
   const values = [
     { n: 'Hoje', v: m.faturamentoHoje },
     { n: 'Semana', v: m.faturamentoSemana },
-    { n: 'Mes', v: m.faturamentoMes }
+    { n: 'Mês', v: m.faturamentoMes }
   ];
   const max = Math.max(...values.map((x) => x.v), 1);
 
@@ -246,7 +280,7 @@ function renderDashboard() {
 
   $('#top-products').innerHTML = m.top.length
     ? m.top.map(([n, q]) => `<div class="top-item"><strong>${escapeHtml(n)}</strong><span class="badge">${q} vendidos</span></div>`).join('')
-    : '<p class="muted">Ainda nao ha vendas suficientes.</p>';
+    : '<p class="muted">Ainda não há vendas suficientes.</p>';
 }
 
 function renderProducts() {
@@ -255,7 +289,7 @@ function renderProducts() {
       || a.nome.localeCompare(b.nome, 'pt-BR');
   });
 
-  refreshProductCategoryOptions(productCategorySelect?.value || 'Outros');
+  refreshProductCategoryOptions(productCategorySelect.value || 'Outros');
 
   $('#products-table').innerHTML = products
     .map((p) => {
@@ -265,7 +299,7 @@ function renderProducts() {
         <div>
           <img src="${escapeHtml(normalizeImage(p.imagem))}" alt="${escapeHtml(p.nome)}" style="width:46px;height:46px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;border:1px solid #ead9cd;">
           <strong>${escapeHtml(p.nome)}</strong><br>
-          <small>${escapeHtml(normalizeCategory(p.categoria))} | ${p.disponivel !== false ? 'Disponivel' : 'Indisponivel'} | ${p.origem === 'padrao' ? 'Padrao' : 'Admin'}</small>
+          <small>${escapeHtml(normalizeCategory(p.categoria))} | ${p.disponivel !== false ? 'Disponível' : 'Indisponível'} | ${p.origem === 'padrao' ? 'Padrão' : 'Admin'}</small>
         </div>
         <strong>${money(p.preco)}</strong>
         <span class="badge">${p.disponivel !== false ? 'Ativo' : 'Inativo'}</span>
@@ -305,7 +339,7 @@ if (productImageFileInput) {
     const isImage = String(file.type || '').startsWith('image/');
     const maxSize = 3 * 1024 * 1024;
     if (!isImage) {
-      alert('Arquivo invalido. Envie apenas imagem.');
+      alert('Arquivo inválido. Envie apenas imagem.');
       productImageFileInput.value = '';
       return;
     }
@@ -335,8 +369,12 @@ $('#product-form').onsubmit = (e) => {
     alert('Informe o nome do produto.');
     return;
   }
+  if (isOutroProductName(nome)) {
+    alert('Use um nome de produto válido. "Outro" não deve ser cadastrado como produto.');
+    return;
+  }
   if (!Number.isFinite(preco) || preco < 0) {
-    alert('Informe um preco valido.');
+    alert('Informe um preço válido.');
     return;
   }
   const imagemFinal = normalizeImage(currentProductImage || existing.imagem);
@@ -386,6 +424,7 @@ window.editProduct = (id) => {
 window.toggleProduct = (id) => {
   const list = MKStore.products();
   const p = list.find((x) => x.id === id);
+  if (!p) return;
   p.disponivel = p.disponivel === false;
   p.atualizadoEm = new Date().toISOString();
   MKStore.saveProducts(list);
@@ -393,7 +432,7 @@ window.toggleProduct = (id) => {
 };
 
 window.deleteProduct = (id) => {
-  if (!confirm('Excluir produto?')) return;
+  if (!confirm('Excluir produto')) return;
   MKStore.saveProducts(MKStore.products().filter((p) => p.id !== id));
   renderProducts();
 };
@@ -411,7 +450,7 @@ function renderPromos() {
   });
 
   if (!promos.length) {
-    $('#promos-table').innerHTML = '<p class="muted">Nenhuma promocao cadastrada.</p>';
+    $('#promos-table').innerHTML = '<p class="muted">Nenhuma promoção cadastrada.</p>';
     return;
   }
 
@@ -424,7 +463,7 @@ function renderPromos() {
           <strong>${escapeHtml(p.nome)}</strong><br>
           <small>${escapeHtml(p.descricao || '')}</small><br>
           <small>Estilo: ${styleLabel[p.estiloPromocao] || 'Desconto'}</small>
-          <small>${p.mostrarNoCardapioGeral ? ' | Tambem no cardapio geral' : ''}</small>
+          <small>${p.mostrarNoCardapioGeral ? ' | Também no cardápio geral' : ''}</small>
         </div>
         <strong>${money(p.precoPromocional)}</strong>
         <span class="badge">${p.ativa ? 'Ativa' : 'Inativa'}</span>
@@ -459,11 +498,11 @@ $('#promo-form').onsubmit = (e) => {
   const nome = normalizeText($('#promo-name').value);
   const precoPromocional = Number($('#promo-price').value || 0);
   if (!nome) {
-    alert('Informe o nome da promocao.');
+    alert('Informe o nome da promoção.');
     return;
   }
   if (!Number.isFinite(precoPromocional) || precoPromocional < 0) {
-    alert('Informe um preco promocional valido.');
+    alert('Informe um preço promocional válido.');
     return;
   }
   const data = {
@@ -510,31 +549,33 @@ window.togglePromoStatus = (id) => {
 };
 
 window.deletePromo = (id) => {
-  if (!confirm('Excluir promocao?')) return;
+  if (!confirm('Excluir promoção')) return;
   MKStore.savePromos(MKStore.promos().filter((p) => p.id !== id));
   renderPromos();
 };
 
 function renderOrders() {
-  const list = MKStore.orders().slice().reverse();
+  const list = MKStore.orders().filter((order) => order && typeof order === 'object').slice().reverse();
   $('#orders-table').innerHTML = list.length
     ? list
       .map((o) => {
-        const oid = escapeJsString(o.id);
+        const item = safeOrder(o);
+        const oid = escapeJsString(item.id);
         const mesa = orderTable(o);
         const details = orderDetailsHtml(o);
         return `
           <div class="row order">
             <div>
-              <strong>Pedido #${escapeHtml(o.codigo || o.id)}</strong><br>
-              <small>${typeLabel(o)} ${mesa ? `| Mesa ${escapeHtml(mesa)}` : ''} | ${new Date(o.criadoEm || o.id).toLocaleString('pt-BR')}</small>
+              <strong>Pedido #${escapeHtml(item.codigo || item.id)}</strong><br>
+              <small>${typeLabel(o)} ${mesa ? `| Mesa ${escapeHtml(mesa)}` : ''} | ${new Date(item.criadoEm || item.id || Date.now()).toLocaleString('pt-BR')}</small>
               ${details ? `<br>${details}` : ''}
+              ${orderItemsHtml(o)}
             </div>
-            <strong>${money(o.total)}</strong>
-            <span class="badge">${o.status}</span>
+            <strong>${money(item.total)}</strong>
+            <span class="badge">${escapeHtml(item.status || 'aguardando')}</span>
             <div class="row-actions">
               <button class="ghost" onclick="printOrder('${oid}')">Imprimir</button>
-              <button class="ghost" onclick="advanceOrder('${oid}')">Avancar</button>
+              <button class="ghost" onclick="advanceOrder('${oid}')">Avançar</button>
             </div>
           </div>
         `;
@@ -548,12 +589,14 @@ window.advanceOrder = (id) => {
   const o = list.find((x) => String(x.id) === String(id));
   if (!o) return;
 
-  const flow = ['recebidos', 'preparando', 'pronto', 'entrega', 'finalizado'];
-  o.status = flow[Math.min(flow.indexOf(o.status) + 1, flow.length - 1)] || 'recebidos';
+  const aliases = { recebidos: 'aguardando', entrega: 'entregue', finalizado: 'entregue' };
+  const flow = ['aguardando', 'preparando', 'pronto', 'entregue'];
+  const status = aliases[o.status] || o.status || 'aguardando';
+  o.status = flow[Math.min(Math.max(flow.indexOf(status), 0) + 1, flow.length - 1)] || 'aguardando';
   o.atualizadoEm = new Date().toISOString();
 
   if (o.status === 'pronto') {
-    MKStore.notifyClient(o, `Seu pedido #${o.codigo || o.id} esta pronto!`);
+    MKStore.notifyClient(o, `Seu pedido #${o.codigo || o.id} está pronto!`);
   }
 
   MKStore.saveOrders(list);
@@ -565,7 +608,7 @@ window.printOrder = (id) => {
   if (!o) return;
   const w = window.open('', '', 'width=360,height=600');
   if (!w) {
-    alert('Nao foi possivel abrir a janela de impressao. Verifique se o bloqueador de pop-up esta ativo.');
+    alert('Não foi possível abrir a janela de impressão. Verifique se o bloqueador de pop-up está ativo.');
     return;
   }
   w.document.write(`<pre style="font:16px monospace">${escapeHtml(buildOrderPrintText(o))}</pre>`);
@@ -573,8 +616,8 @@ window.printOrder = (id) => {
 };
 
 $('#clear-finalized').onclick = () => {
-  if (confirm('Remover pedidos finalizados?')) {
-    MKStore.saveOrders(MKStore.orders().filter((o) => o.status !== 'finalizado'));
+  if (confirm('Remover pedidos finalizados')) {
+    MKStore.saveOrders(MKStore.orders().filter((o) => !['entregue', 'finalizado'].includes(o.status)));
     renderOrders();
     renderDashboard();
   }
@@ -587,7 +630,7 @@ function sanitizeTableCount(value) {
 }
 
 function getTableCountFromConfig(config) {
-  return sanitizeTableCount(config?.quantidadeMesas ?? config?.mesas ?? DEFAULT_TABLES_COUNT);
+  return sanitizeTableCount(config.quantidadeMesas ?? config.mesas ?? DEFAULT_TABLES_COUNT);
 }
 
 function updateTableSelects(totalMesas) {
@@ -662,18 +705,18 @@ window.carregarCredenciais = (force = false) => {
 window.salvarCredenciais = (event) => {
   if (event) event.preventDefault();
   if (!window.MKStore || typeof MKStore.adminCredentials !== 'function' || typeof MKStore.saveAdminCredentials !== 'function') {
-    alert('Nao foi possivel atualizar as credenciais.');
+    alert('Não foi possível atualizar as credenciais.');
     return;
   }
 
   const currentCreds = MKStore.adminCredentials();
-  const usuario = normalizeText($('#sec-user')?.value);
-  const senhaAtual = String($('#sec-current-pass')?.value || '');
-  const novaSenha = String($('#sec-new-pass')?.value || '');
-  const confirmarSenha = String($('#sec-confirm-pass')?.value || '');
+  const usuario = normalizeText($('#sec-user').value);
+  const senhaAtual = String($('#sec-current-pass').value || '');
+  const novaSenha = String($('#sec-new-pass').value || '');
+  const confirmarSenha = String($('#sec-confirm-pass').value || '');
 
   if (!usuario) {
-    alert('Informe o usuario.');
+    alert('Informe o usuário.');
     return;
   }
 
@@ -688,14 +731,14 @@ window.salvarCredenciais = (event) => {
   }
 
   if (novaSenha !== confirmarSenha) {
-    alert('A confirmacao da nova senha nao confere.');
+    alert('A confirmação da nova senha não confere.');
     return;
   }
 
   MKStore.saveAdminCredentials({ usuario, senha: novaSenha });
   clearSecurityFormFields();
   carregarCredenciais(true);
-  alert('Credenciais atualizadas com sucesso. Faca login novamente.');
+  alert('Credenciais atualizadas com sucesso. Faça login novamente.');
   sessionStorage.removeItem('mk_admin_auth');
   sessionStorage.removeItem('mk_admin_user');
   location.href = 'admin-login.html';

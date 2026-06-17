@@ -12,14 +12,14 @@
     <section class="login-brand">
       <span class="eyebrow">Painel premium</span>
       <h1>MK Lanchonete</h1>
-      <p>Controle produtos, promocoes, pedidos, cozinha, mesas e faturamento em um so lugar.</p>
+      <p>Controle produtos, promoções, pedidos, cozinha, mesas e faturamento em um só lugar.</p>
     </section>
     <form class="login-box" id="login-form">
       <h2>Acessar painel</h2>
-      <label>Usuario<input id="login-user" autocomplete="username" placeholder="admin" required></label>
-      <label>Senha<input id="login-pass" type="password" autocomplete="current-password" placeholder="123456" required></label>
+      <label>Usuário<input id="login-user" autocomplete="username" placeholder="admin" required></label>
+      <label>Senha<input id="login-pass" type="password" autocomplete="current-password" placeholder="*****" required></label>
       <button type="submit">Entrar</button>
-      <small>Login inicial: <strong>admin</strong> / <strong>123456</strong></small>
+
       <small id="login-error" style="display:none;color:#b91c1c;"></small>
     </form>
   </main>
@@ -57,10 +57,10 @@
       }
 
       if (errorBox) {
-        errorBox.textContent = 'Usuario ou senha incorretos.';
+        errorBox.textContent = 'Usuário ou senha incorretos.';
         errorBox.style.display = 'block';
       } else {
-        alert('Usuario ou senha incorretos.');
+        alert('Usuário ou senha incorretos.');
       }
     });
 

@@ -2,10 +2,10 @@
   const CATEGORY_ORDER = [
     'Pizza',
     'Doces',
-    'Hamburguer Tradicional',
-    'Hamburguer Gourmet',
+    'Hambúrguer Tradicional',
+    'Hambúrguer Gourmet',
     'Sorvete',
-    'Acai',
+    'Açaí',
     'Bebidas',
     'Outros'
   ];
@@ -29,7 +29,24 @@
 
   function normalizeCategory(value){
     const category = normalizeText(value);
+    if (category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'acai') {
+      return 'Açaí';
+    }
     return category || 'Outros';
+  }
+
+  function normalizeForMatch(value){
+    return normalizeText(value)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function isOutroProductName(value){
+    const name = normalizeForMatch(value);
+    return name === 'outro' || name === 'outros';
   }
 
   function categoryToSlug(value){
@@ -83,7 +100,7 @@
       a.dataset.adminPromoGeral = 'true';
     }
 
-    const nome = escapeHtml(promo.nome || 'Promocao');
+    const nome = escapeHtml(promo.nome || 'Promoção');
     const descricao = escapeHtml(promoDescription(promo));
     const imagem = escapeHtml(promo.imagem || 'img/hamb.gourmet.jpg');
     const preco = money(promo.precoPromocional || 0);
@@ -98,7 +115,7 @@
     [...wrap.children].forEach((node) => {
       const isHeading = node.tagName === 'H2';
       const isCard = node.tagName === 'A' && !!node.querySelector('.card-info h2');
-      const isPromoGrid = node.classList?.contains('promocoes-grid');
+      const isPromoGrid = node.classList.contains('promocoes-grid');
       if (isHeading || isCard || isPromoGrid) {
         node.remove();
       }
@@ -132,7 +149,9 @@
     clearCatalogNodes(wrap);
 
     const activePromos = MKStore.promos().filter((promo) => promo.ativa !== false);
-    const activeProducts = MKStore.products().filter((product) => product.disponivel !== false);
+    const activeProducts = MKStore.products().filter((product) => (
+      product.disponivel !== false && !isOutroProductName(product.nome)
+    ));
 
     const promoGeneralCards = activePromos.filter((promo) => promo.mostrarNoCardapioGeral);
     promoGeneralCards.forEach((promo) => wrap.appendChild(buildPromoCard(promo, false)));
@@ -141,7 +160,7 @@
       const promoTitle = document.createElement('h2');
       promoTitle.id = 'promocoes';
       promoTitle.dataset.adminPromocoes = 'true';
-      promoTitle.textContent = 'Promocoes';
+      promoTitle.textContent = 'Promoções';
       wrap.appendChild(promoTitle);
 
       const promoGrid = document.createElement('div');
