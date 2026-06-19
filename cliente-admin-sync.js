@@ -1,13 +1,18 @@
 (function(){
   const CATEGORY_ORDER = [
-    'Pizza',
-    'Doces',
-    'Hambúrguer Tradicional',
-    'Hambúrguer Gourmet',
-    'Sorvete',
-    'Açaí',
-    'Bebidas',
-    'Outros'
+    "Pizzas",
+    "Pizzas Doces",
+    "Bordas Recheadas",
+    "Hambúrgueres",
+    "Hambúrgueres Gourmet",
+    "Beirutes",
+    "Porções",
+    "Adicionais",
+    "Sorvete",
+    "Açaí",
+    "Sucos",
+    "Bebidas",
+    "Outros"
   ];
 
   function money(v){
@@ -29,12 +34,19 @@
 
   function normalizeCategory(value){
     const category = normalizeText(value);
-    if (category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'acai') {
-      return 'Açaí';
+    const match = normalizeForMatch(category);
+    if (match === 'hamburgueres gourmet' || match === 'hamburguer gourmet' || match === 'gourmet') {
+      return 'Hambúrgueres Gourmet';
     }
+    if (match === 'hamburgueres' || match === 'hamburguer tradicional' || match === 'hamburgueres tradicionais') {
+      return 'Hambúrgueres';
+    }
+    if (match === 'pizzas' || match === 'pizza') return 'Pizzas';
+    if (match === 'doces' || match === 'pizza doce' || match === 'pizzas doces') return 'Pizzas Doces';
+    if (match === 'porcoes' || match === 'porcao') return 'Porções';
+    if (match === 'acai') return 'Açaí';
     return category || 'Outros';
   }
-
   function normalizeForMatch(value){
     return normalizeText(value)
       .normalize('NFD')
@@ -62,16 +74,38 @@
       .replace(/^-|-$/g, '') || 'outros';
   }
 
+
+  function fallbackDescription(product, name, category){
+    const normalizedCategory = normalizeForMatch(category);
+    if (normalizedCategory === 'acai') {
+      return 'Açaí cremoso com acompanhamentos e calda à escolha.';
+    }
+    if (normalizedCategory === 'bebidas' || normalizedCategory === 'sucos') {
+      return 'Bebida gelada selecionada para acompanhar seu pedido.';
+    }
+    if (normalizedCategory.includes('hamburguer') || normalizedCategory === 'beirutes') {
+      return 'Preparado com ingredientes selecionados e muito sabor.';
+    }
+    if (normalizedCategory.includes('pizza') || normalizedCategory === 'bordas recheadas' || normalizedCategory === 'porcoes' || normalizedCategory === 'adicionais') {
+      return 'Receita especial da casa, feita para compartilhar bons momentos.';
+    }
+    if (normalizedCategory === 'sorvete') {
+      return 'Sobremesa cremosa e refrescante para finalizar o pedido.';
+    }
+    return `${name} preparado com o padrão de qualidade da casa.`;
+  }
   function buildProductCard(product){
     const a = document.createElement('a');
     a.href = '#';
-    a.dataset.category = categoryToSlug(product.categoria);
+    const categoria = normalizeCategory(product.categoria || product.category);
+    a.dataset.category = categoryToSlug(categoria);
     a.dataset.adminProduto = 'true';
 
-    const nome = escapeHtml(product.nome || 'Produto');
-    const descricao = escapeHtml(product.descricao || '');
-    const imagem = escapeHtml(product.imagem || 'img/hamb.gourmet.jpg');
-    const preco = money(product.preco || 0);
+    const rawName = product.nome || product.name || product.title || 'Produto';
+    const nome = escapeHtml(rawName);
+    const descricao = escapeHtml(product.descricao || product.description || product.desc || fallbackDescription(product, rawName, categoria));
+    const imagem = escapeHtml(product.imagem || product.image || 'img/img-header.png');
+    const preco = money(product.preco ?? product.price ?? 0);
 
     a.innerHTML = `<img src="${imagem}" alt="${nome}">
       <div class="card-info"><h2>${nome}</h2><p>${descricao}</p><h4>${preco}</h4></div>`;
@@ -80,7 +114,7 @@
   }
 
   function promoDescription(promo){
-    const desc = String(promo.descricao || '').trim();
+    const desc = String(promo.descricao || promo.description || promo.desc || '').trim();
     const style = String(promo.estiloPromocao || '').trim();
     if (!desc) return style ? `Estilo: ${style}` : '';
     return desc;
@@ -100,10 +134,10 @@
       a.dataset.adminPromoGeral = 'true';
     }
 
-    const nome = escapeHtml(promo.nome || 'Promoção');
+    const nome = escapeHtml(promo.nome || promo.name || promo.title || 'Promoção');
     const descricao = escapeHtml(promoDescription(promo));
-    const imagem = escapeHtml(promo.imagem || 'img/hamb.gourmet.jpg');
-    const preco = money(promo.precoPromocional || 0);
+    const imagem = escapeHtml(promo.imagem || promo.image || 'img/img-header.png');
+    const preco = money(promo.precoPromocional ?? promo.price ?? 0);
 
     a.innerHTML = `<img src="${imagem}" alt="${nome}">
       <div class="card-info"><h2>${nome}</h2><p>${descricao}</p><h4>${preco}</h4></div>`;
@@ -115,17 +149,40 @@
     [...wrap.children].forEach((node) => {
       const isHeading = node.tagName === 'H2';
       const isCard = node.tagName === 'A' && !!node.querySelector('.card-info h2');
+      const isCardsContainer = node.classList.contains('cards-container') || node.classList.contains('flex-cards');
       const isPromoGrid = node.classList.contains('promocoes-grid');
-      if (isHeading || isCard || isPromoGrid) {
+      if (isHeading || isCard || isCardsContainer || isPromoGrid) {
         node.remove();
       }
     });
   }
 
+  function buildCardsContainer(){
+    const container = document.createElement('div');
+    container.className = 'cards-container';
+    return container;
+  }
+  function productRenderKey(product){
+    const name = normalizeForMatch(product.nome || product.name || product.title);
+    const category = normalizeForMatch(normalizeCategory(product.categoria || product.category));
+    if (name && category) return `${name}::${category}`;
+    return String(product.id || '').trim();
+  }
+
+  function dedupeProductsForRender(products){
+    const seen = new Set();
+    return products.filter((product) => {
+      const key = productRenderKey(product);
+      if (!key) return true;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
   function groupedCategories(products){
     const groups = new Map();
     products.forEach((product) => {
-      const category = normalizeCategory(product.categoria);
+      const category = normalizeCategory(product.categoria || product.category);
       if (!groups.has(category)) groups.set(category, []);
       groups.get(category).push(product);
     });
@@ -149,12 +206,16 @@
     clearCatalogNodes(wrap);
 
     const activePromos = MKStore.promos().filter((promo) => promo.ativa !== false);
-    const activeProducts = MKStore.products().filter((product) => (
-      product.disponivel !== false && !isOutroProductName(product.nome)
-    ));
+    const activeProducts = dedupeProductsForRender(MKStore.products().filter((product) => (
+      product.disponivel !== false && !isOutroProductName(product.nome || product.name || product.title)
+    )));
 
     const promoGeneralCards = activePromos.filter((promo) => promo.mostrarNoCardapioGeral);
-    promoGeneralCards.forEach((promo) => wrap.appendChild(buildPromoCard(promo, false)));
+    if (promoGeneralCards.length) {
+      const promoGeneralContainer = buildCardsContainer();
+      promoGeneralCards.forEach((promo) => promoGeneralContainer.appendChild(buildPromoCard(promo, false)));
+      wrap.appendChild(promoGeneralContainer);
+    }
 
     if (activePromos.length) {
       const promoTitle = document.createElement('h2');
@@ -180,9 +241,11 @@
       sectionTitle.textContent = `${category}:`;
       wrap.appendChild(sectionTitle);
 
+      const cardsContainer = buildCardsContainer();
       groups.get(category).forEach((product) => {
-        wrap.appendChild(buildProductCard(product));
+        cardsContainer.appendChild(buildProductCard(product));
       });
+      wrap.appendChild(cardsContainer);
     });
   }
 

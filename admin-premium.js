@@ -23,12 +23,17 @@ const DEFAULT_TABLES_COUNT = 10;
 
 const PRODUCT_IMAGE_PLACEHOLDER = 'img/hamb.gourmet.jpg';
 const DEFAULT_PRODUCT_CATEGORIES = [
-  'Pizza',
-  'Doces',
-  'Hambúrguer Tradicional',
-  'Hambúrguer Gourmet',
+  'Pizzas',
+  'Pizzas Doces',
+  'Bordas Recheadas',
+  'Hambúrgueres',
+  'Hambúrgueres Gourmet',
+  'Beirutes',
+  'Porções',
+  'Adicionais',
   'Sorvete',
   'Açaí',
+  'Sucos',
   'Bebidas',
   'Outros'
 ];
@@ -70,12 +75,19 @@ function escapeJsString(value) {
 
 function normalizeCategory(value) {
   const category = normalizeText(value);
-  if (category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'acai') {
-    return 'Açaí';
+  const match = normalizeForMatch(category);
+  if (match === 'hamburgueres gourmet' || match === 'hamburguer gourmet' || match === 'gourmet') {
+    return 'Hambúrgueres Gourmet';
   }
+  if (match === 'hamburgueres' || match === 'hamburguer tradicional' || match === 'hamburgueres tradicionais') {
+    return 'Hambúrgueres';
+  }
+  if (match === 'pizzas' || match === 'pizza') return 'Pizzas';
+  if (match === 'doces' || match === 'pizza doce' || match === 'pizzas doces') return 'Pizzas Doces';
+  if (match === 'porcoes' || match === 'porcao') return 'Porções';
+  if (match === 'acai') return 'Açaí';
   return category || 'Outros';
 }
-
 function normalizeForMatch(value) {
   return normalizeText(value)
     .normalize('NFD')
@@ -93,7 +105,7 @@ function isOutroProductName(value) {
 function refreshProductCategoryOptions(selectedValue = 'Outros') {
   if (!productCategorySelect) return;
 
-  const categories = new Set(DEFAULT_PRODUCT_CATEGORIES);
+  const categories = new Set(DEFAULT_PRODUCT_CATEGORIES.map(normalizeCategory));
   MKStore.products().forEach((product) => categories.add(normalizeCategory(product.categoria)));
   if (selectedValue) categories.add(normalizeCategory(selectedValue));
 

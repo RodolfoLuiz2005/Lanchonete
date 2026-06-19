@@ -1,0 +1,8 @@
+2026/06/18-23:38:55.758 2d8c Creating DB C:\Users\rodol\OneDrive\Documents\projetos\projetos\LanchoneteOrigin1\.chrome-qa-profile\Default\Local Storage\leveldb since it was missing.
+2026/06/18-23:38:55.878 2d8c Reusing MANIFEST C:\Users\rodol\OneDrive\Documents\projetos\projetos\LanchoneteOrigin1\.chrome-qa-profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/18-23:42:26.246 341c Level-0 table #5: started
+2026/06/18-23:42:26.262 341c Level-0 table #5: 13626 bytes OK
+2026/06/18-23:42:26.266 341c Delete type=0 #3
+2026/06/18-23:45:05.733 341c Level-0 table #7: started
+2026/06/18-23:45:05.755 341c Level-0 table #7: 15167 bytes OK
+2026/06/18-23:45:05.759 341c Delete type=0 #4

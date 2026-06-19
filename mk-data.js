@@ -23,8 +23,8 @@
 
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
-  const defaultImage = 'img/bomgourmet_2F2021_2F05_2F24202047_2Fhamburguer-janelabar-divulgacao.jpg';
-  const gourmetImage = 'img/hamb.gourmet.jpg';
+  const defaultImage = 'img/img-header.png';
+  const gourmetImage = 'img/img-header.png';
   const DEFAULT_TABLES = 10;
   const DEFAULT_ADMIN_USERNAME = 'admin';
   const DEFAULT_ADMIN_PASSWORD = '123456';
@@ -46,58 +46,92 @@
   }
 
   const produtosPadrao = [
-    makeDefaultProduct('produto-pizza-calabresa', 'Calabresa', 'Molho de tomate, mussarela, calabresa, cebola, azeitonas e orégano.', 41.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-portuguesa', 'Portuguesa', 'Molho de tomate, mussarela, ovo, presunto, calabresa, tomate, milho, ervilha, pimentão, azeitona e orégano.', 49.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-frango', 'Frango', 'Molho de tomate, mussarela, frango, azeitona e orégano.', 44.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-mk', 'MK', 'Molho de tomate, mussarela, camarão, portuguesa, calabresa, frango, tomate, azeitona e orégano.', 58.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-camarao', 'Camarão', 'Molho de tomate, mussarela, camarão, catupiry, azeitona e orégano.', 68.99, 'Pizza'),
-    makeDefaultProduct('produto-pizza-luiz-gonzaga', 'Luiz Gonzaga', 'Molho de tomate, mussarela, charque desfiada, carne de sol desfiada, bacon, cebola e orégano.', 68.99, 'Pizza'),
-
-    makeDefaultProduct('produto-doce-chocolate', 'Chocolate', 'Mussarela, chocolate derretido e M&M.', 33.99, 'Doces'),
-    makeDefaultProduct('produto-doce-banana', 'Banana', 'Mussarela, banana, açúcar e canela.', 33.99, 'Doces'),
-    makeDefaultProduct('produto-doce-romeu-julieta', 'Romeu e Julieta', 'Mussarela, goiabada e queijo minas.', 68.99, 'Doces'),
-
-    makeDefaultProduct('produto-hamb-tradicional', 'Tradicional', 'Pão, carne, creme de milho, tomate e cebola caramelizada.', 18.99, 'Hambúrguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-burguer', 'X-Burguer', 'Pão, carne, queijo, alface, tomate e maionese.', 22.99, 'Hambúrguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-bacon', 'X-Bacon', 'Pão, carne, queijo, bacon crocante, alface, tomate e maionese.', 26.99, 'Hambúrguer Tradicional'),
-    makeDefaultProduct('produto-hamb-x-tudo', 'X-Tudo', 'Pão, carne, queijo, bacon, ovo, presunto, alface, tomate e maionese.', 32.99, 'Hambúrguer Tradicional'),
-    makeDefaultProduct('produto-hamb-duplo', 'Duplo', 'Pão, dois hambúrgueres, queijo duplo, alface, tomate e molho especial.', 36.99, 'Hambúrguer Tradicional'),
-
-    makeDefaultProduct('produto-gourmet-smash-classico', 'Smash Clássico', 'Pão brioche, blend artesanal, cebola caramelizada, queijo gouda e maionese trufada.', 42.99, 'Hambúrguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-bbq-bacon', 'BBQ Bacon', 'Pão brioche, blend artesanal, bacon crispy, queijo cheddar, molho BBQ e cebola crispy.', 48.99, 'Hambúrguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-cogumelos', 'Cogumelos', 'Pão brioche, blend artesanal, cogumelos salteados, queijo brie, rúcula e aioli de alho.', 52.99, 'Hambúrguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-big-mac-1', 'Big Mac', 'Pão com gergelim, dois hambúrgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hambúrguer Gourmet', gourmetImage),
-    makeDefaultProduct('produto-gourmet-big-mac-2', 'Big Mac', 'Pão com gergelim, dois hambúrgueres, alface, queijo, picles, cebola e molho especial.', 38.99, 'Hambúrguer Gourmet', gourmetImage),
-
-    makeDefaultProduct('produto-sorvete-casquinha', 'Casquinha Tradicional', 'Casquinha crocante com sorvete de creme, chocolate ou morango.', 6.99, 'Sorvete'),
-    makeDefaultProduct('produto-sorvete-sundae', 'Sundae', 'Sorvete de baunilha com calda de caramelo ou chocolate.', 12.99, 'Sorvete'),
-    makeDefaultProduct('produto-sorvete-milkshake', 'Milkshake', 'Milkshake cremoso de chocolate, morango ou baunilha.', 18.99, 'Sorvete'),
-    makeDefaultProduct('produto-sorvete-copa', 'Copa de Sorvete', 'Copa com duas bolas de sorvete a escolha, calda e granulado.', 15.99, 'Sorvete'),
-    makeDefaultProduct('produto-sorvete-especial', 'Sorvete Especial', 'Sorvete artesanal com mix de frutas vermelhas e chantilly.', 22.99, 'Sorvete'),
-
-    makeDefaultProduct('produto-acai-400-sem-sorvete', 'Açaí 400ML S/Sorvete', '', 11.99, 'Açaí'),
-    makeDefaultProduct('produto-acai-400-com-sorvete', 'Açaí 400ML C/Sorvete', '', 14.99, 'Açaí'),
-    makeDefaultProduct('produto-acai-600-sem-sorvete', 'Açaí 600ML S/Sorvete', '', 14.99, 'Açaí'),
-    makeDefaultProduct('produto-acai-600-com-sorvete', 'Açaí 600ML C/Sorvete', '', 17.99, 'Açaí'),
-
-    makeDefaultProduct('produto-bebida-refrigerante-lata', 'Refrigerante Lata', 'Coca-Cola, Guaraná, Sprite ou Fanta lata 350ml gelada.', 6.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-suco-natural', 'Suco Natural', 'Suco natural de laranja, limão, maracujá ou abacaxi copo 400ml.', 10.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-agua-mineral', 'Água Mineral', 'Água mineral sem gás ou com gás garrafa 500ml.', 4.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-cha-gelado', 'Chá Gelado', 'Chá gelado de pêssego, limão ou maçã copo 400ml.', 8.99, 'Bebidas'),
-    makeDefaultProduct('produto-bebida-vitamina-frutas', 'Vitamina de Frutas', 'Vitamina cremosa de banana com morango, manga ou abacate 400ml.', 13.99, 'Bebidas')
+    makeDefaultProduct("produto-pizzas-pizza-mussarela", "Pizza Mussarela", "Molho de tomate, mussarela, tomate, azeitonas e orégano.", 41.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-calabresa", "Pizza Calabresa", "Molho de tomate, mussarela, calabresa, cebola, azeitonas e orégano.", 43.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-presunto", "Pizza Presunto", "Molho de tomate, mussarela, presunto, tomate, azeitonas e orégano.", 41.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-mista", "Pizza Mista", "Molho de tomate, mussarela, calabresa, presunto, tomate, azeitonas e orégano.", 43.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-nordestina", "Pizza Nordestina", "Molho de tomate, mussarela, carne de sol desfiada, cebola e orégano.", 56.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-atum", "Pizza Atum", "Molho de tomate, mussarela, atum, cebola, tomate, azeitonas e orégano.", 51.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-camarao", "Pizza Camarão", "Molho de tomate, mussarela, camarão, catupiry, azeitonas e orégano.", 68.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-bacon", "Pizza Bacon", "Molho de tomate, mussarela, bacon, tomate, azeitonas e orégano.", 41.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-mk", "Pizza MK", "Molho de tomate, mussarela, camarão, portuguesa, calabresa, frango, tomate, azeitonas e orégano.", 58.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-portuguesa", "Pizza Portuguesa", "Molho de tomate, mussarela, ovo, presunto, calabresa, tomate, milho, ervilha, pimentão, azeitonas e orégano.", 49.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-frango", "Pizza Frango", "Molho de tomate, mussarela, frango, tomate, azeitonas e orégano.", 44.99, "Pizzas"),
+    makeDefaultProduct("produto-pizzas-pizza-frango-com-catupiry", "Pizza Frango com Catupiry", "Molho de tomate, mussarela, frango, catupiry, tomate, azeitonas e orégano.", 51.99, "Pizzas"),
+    makeDefaultProduct("produto-pizza-luiz-gonzaga", "Pizza Luiz Gonzaga", "Molho de tomate, mussarela, charque desfiado, carne de sol desfiada, bacon, cebola e orégano.", 77.99, "Pizzas"),
+    makeDefaultProduct("produto-doce-chocolate", "Pizza de Chocolate", "Mussarela, chocolate derretido e M&M.", 33.99, "Pizzas Doces"),
+    makeDefaultProduct("produto-doce-banana", "Pizza de Banana", "Mussarela, banana, açúcar e canela.", 33.99, "Pizzas Doces"),
+    makeDefaultProduct("produto-doce-romeu-julieta", "Pizza Romeu e Julieta", "Mussarela, goiabada derretida e catupiry.", 36.99, "Pizzas Doces"),
+    makeDefaultProduct("produto-bordas-recheadas-borda-de-catupiry", "Borda de Catupiry", "Borda recheada com catupiry cremoso.", 14.99, "Bordas Recheadas"),
+    makeDefaultProduct("produto-bordas-recheadas-borda-de-cheddar", "Borda de Cheddar", "Borda recheada com cheddar cremoso.", 14.99, "Bordas Recheadas"),
+    makeDefaultProduct("produto-hamb-tradicional", "Hambúrguer Tradicional", "Pão, carne industrial, creme de milho, tomate e cebola caramelizada.", 11.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamb-x-burguer", "X-Burguer Tradicional", "Pão, carne industrial, queijo, creme de milho, tomate e cebola caramelizada.", 13.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamburgueres-x-egg-tradicional", "X-Egg Tradicional", "Pão, carne industrial, queijo, ovo, creme de milho, tomate e cebola caramelizada.", 15.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamburgueres-x-dog-tradicional", "X-Dog Tradicional", "Pão, carne industrial, queijo, ovo, salsicha, creme de milho, tomate e cebola caramelizada.", 17.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamburgueres-x-calabresa-tradicional", "X-Calabresa Tradicional", "Pão, carne industrial, queijo, ovo, calabresa, creme de milho, tomate e cebola caramelizada.", 18.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamb-x-bacon", "X-Bacon Tradicional", "Pão, carne industrial, queijo, ovo, bacon, creme de milho, tomate e cebola caramelizada.", 18.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamb-x-tudo", "X-Tudo Tradicional", "Pão, carne industrial, queijo, ovo, calabresa, bacon, salsicha, creme de milho, tomate e cebola caramelizada.", 20.99, "Hambúrgueres"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-hamburguer-gourmet", "Hambúrguer Gourmet", "Pão, carne gourmet, creme de milho, tomate e cebola caramelizada.", 15.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-burguer-gourmet", "X-Burguer Gourmet", "Pão, carne gourmet, queijo, creme de milho, tomate e cebola caramelizada.", 16.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-egg-gourmet", "X-Egg Gourmet", "Pão, carne gourmet, queijo, ovo, creme de milho, tomate e cebola caramelizada.", 18.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-dog-gourmet", "X-Dog Gourmet", "Pão, carne gourmet, queijo, ovo, salsicha, creme de milho, tomate e cebola caramelizada.", 20.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-calabresa-gourmet", "X-Calabresa Gourmet", "Pão, carne gourmet, queijo, ovo, calabresa, creme de milho, tomate e cebola caramelizada.", 21.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-frango-gourmet", "X-Frango Gourmet", "Pão, frango gourmet, queijo, ovo, creme de milho, tomate e cebola caramelizada.", 18.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-bacon-gourmet", "X-Bacon Gourmet", "Pão, carne gourmet, queijo, ovo, bacon, creme de milho, tomate e cebola caramelizada.", 21.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-hamburgueres-gourmet-x-tudo-gourmet", "X-Tudo Gourmet", "Pão, carne gourmet, queijo, ovo, calabresa, bacon, salsicha, creme de milho, tomate e cebola caramelizada.", 23.99, "Hambúrgueres Gourmet"),
+    makeDefaultProduct("produto-beirutes-beirute-de-calabresa", "Beirute de Calabresa", "Beirute recheado com calabresa, queijo, salada e molho especial.", 29.99, "Beirutes"),
+    makeDefaultProduct("produto-beirutes-beirute-de-carne-de-sol", "Beirute de Carne de Sol", "Beirute recheado com carne de sol, queijo, salada e molho especial.", 39.99, "Beirutes"),
+    makeDefaultProduct("produto-beirutes-beirute-de-frango", "Beirute de Frango", "Beirute recheado com frango, queijo, salada e molho especial.", 29.99, "Beirutes"),
+    makeDefaultProduct("produto-porcoes-bolinho-de-bacalhau", "Bolinho de Bacalhau", "Porção de bolinhos de bacalhau crocantes e saborosos.", 17.00, "Porções"),
+    makeDefaultProduct("produto-porcoes-bolinho-de-charque", "Bolinho de Charque", "Porção de bolinhos recheados com charque.", 17.00, "Porções"),
+    makeDefaultProduct("produto-porcoes-bolinho-de-queijo", "Bolinho de Queijo", "Porção de bolinhos de queijo crocantes por fora e cremosos por dentro.", 17.00, "Porções"),
+    makeDefaultProduct("produto-porcoes-bolinho-de-costela", "Bolinho de Costela", "Porção de bolinhos recheados com costela.", 19.00, "Porções"),
+    makeDefaultProduct("produto-porcoes-batata-frita", "Batata Frita", "Porção de batata frita crocante.", 12.00, "Porções"),
+    makeDefaultProduct("produto-porcoes-batata-frita-recheada-com-bacon-e-cheddar", "Batata Frita Recheada com Bacon e Cheddar", "Batata frita com bacon e cheddar cremoso.", 17.00, "Porções"),
+    makeDefaultProduct("produto-adicionais-adicional-de-bacon", "Adicional de Bacon", "Porção extra de bacon para complementar seu lanche.", 6.00, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-calabresa", "Adicional de Calabresa", "Porção extra de calabresa.", 6.00, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-carne", "Adicional de Carne", "Porção extra de carne.", 7.00, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-carne-de-sol", "Adicional de Carne de Sol", "Porção extra de carne de sol.", 9.99, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-ovo", "Adicional de Ovo", "Ovo extra para complementar seu lanche.", 2.00, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-queijo", "Adicional de Queijo", "Porção extra de queijo.", 4.00, "Adicionais"),
+    makeDefaultProduct("produto-adicionais-adicional-de-salsicha", "Adicional de Salsicha", "Porção extra de salsicha.", 3.00, "Adicionais"),
+    makeDefaultProduct("produto-sucos-suco-de-acerola", "Suco de Acerola", "Suco natural de acerola.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-caja", "Suco de Cajá", "Suco natural de cajá.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-caju", "Suco de Caju", "Suco natural de caju.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-graviola", "Suco de Graviola", "Suco natural de graviola.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-tamarindo", "Suco de Tamarindo", "Suco natural de tamarindo.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-uva", "Suco de Uva", "Suco natural de uva.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-maracuja", "Suco de Maracujá", "Suco natural de maracujá.", 5.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-acerola-com-leite", "Suco de Acerola com Leite", "Suco de acerola batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-caja-com-leite", "Suco de Cajá com Leite", "Suco de cajá batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-caju-com-leite", "Suco de Caju com Leite", "Suco de caju batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-graviola-com-leite", "Suco de Graviola com Leite", "Suco de graviola batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-tamarindo-com-leite", "Suco de Tamarindo com Leite", "Suco de tamarindo batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-uva-com-leite", "Suco de Uva com Leite", "Suco de uva batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-sucos-suco-de-maracuja-com-leite", "Suco de Maracujá com Leite", "Suco de maracujá batido com leite.", 6.00, "Sucos"),
+    makeDefaultProduct("produto-bebidas-agua-com-gas", "Água com Gás", "Água com gás gelada.", 3.50, "Bebidas"),
+    makeDefaultProduct("produto-bebida-agua-mineral", "Água Mineral", "Água mineral gelada.", 3.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-antarctica-200ml", "Antarctica 200ml", "Refrigerante Antarctica 200ml gelado.", 3.50, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-coca-cola-250ml", "Coca-Cola 250ml", "Coca-Cola 250ml gelada.", 4.00, "Bebidas"),
+    makeDefaultProduct("produto-bebida-refrigerante-lata", "Refrigerante Lata", "Refrigerante em lata gelado.", 6.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-refrigerante-1-litro", "Refrigerante 1 Litro", "Refrigerante de 1 litro gelado.", 11.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-refrigerante-2-litros", "Refrigerante 2 Litros", "Refrigerante de 2 litros gelado.", 16.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-guarana-do-amazonas-400ml", "Guaraná do Amazonas 400ml", "Guaraná do Amazonas 400ml gelado.", 7.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-h2o", "H2O", "Bebida H2O gelada.", 8.00, "Bebidas"),
+    makeDefaultProduct("produto-bebidas-milkshake-400ml", "Milkshake 400ml", "Milkshake cremoso de 400ml.", 15.00, "Bebidas"),
+    makeDefaultProduct("produto-bebida-vitamina-frutas", "Vitamina de Açaí 500ml", "Vitamina de açaí cremosa de 500ml.", 16.00, "Bebidas"),
+    makeDefaultProduct("produto-sorvete-casquinha", "Casquinha Tradicional", "Casquinha crocante com sorvete de creme, chocolate ou morango.", 6.99, "Sorvete"),
+    makeDefaultProduct("produto-sorvete-sundae", "Sundae", "Sorvete de baunilha com calda de caramelo ou chocolate.", 12.99, "Sorvete"),
+    makeDefaultProduct("produto-sorvete-milkshake", "Milkshake", "Milkshake cremoso de chocolate, morango ou baunilha.", 18.99, "Sorvete"),
+    makeDefaultProduct("produto-sorvete-copa", "Copa de Sorvete", "Copa com duas bolas de sorvete a escolha, calda e granulado.", 15.99, "Sorvete"),
+    makeDefaultProduct("produto-sorvete-especial", "Sorvete Especial", "Sorvete artesanal com mix de frutas vermelhas e chantilly.", 22.99, "Sorvete"),
+    makeDefaultProduct("produto-acai-400-sem-sorvete", "Açaí 400ML S/Sorvete", "Açaí cremoso de 400ml com até 7 acompanhamentos e calda à escolha.", 11.99, "Açaí"),
+    makeDefaultProduct("produto-acai-400-com-sorvete", "Açaí 400ML C/Sorvete", "Açaí cremoso de 400ml com sorvete, acompanhamentos e calda à escolha.", 14.99, "Açaí"),
+    makeDefaultProduct("produto-acai-600-sem-sorvete", "Açaí 600ML S/Sorvete", "Açaí cremoso de 600ml com até 7 acompanhamentos e calda à escolha.", 14.99, "Açaí"),
+    makeDefaultProduct("produto-acai-600-com-sorvete", "Açaí 600ML C/Sorvete", "Açaí cremoso de 600ml com sorvete, acompanhamentos e calda à escolha.", 17.99, "Açaí")
   ];
 
-  const produtosObrigatoriosCardapio = new Set([
-    'produto-acai-400-sem-sorvete',
-    'produto-acai-400-com-sorvete',
-    'produto-acai-600-sem-sorvete',
-    'produto-acai-600-com-sorvete',
-    'produto-bebida-refrigerante-lata',
-    'produto-bebida-suco-natural',
-    'produto-bebida-agua-mineral',
-    'produto-bebida-cha-gelado',
-    'produto-bebida-vitamina-frutas'
-  ]);
+  const produtosObrigatoriosCardapio = new Set(produtosPadrao.map((product) => String(product.id)));
 
   const promoStyles = ['desconto', 'combo', 'clone', 'destaque'];
 
@@ -110,6 +144,20 @@
     return String(value || '').trim();
   }
 
+  function normalizeImagePath(value, fallback = defaultImage){
+    const image = normalizeText(value);
+    if (!image) return fallback;
+
+    const normalized = image.replace(/\\/g, '/');
+    if (
+      normalized.endsWith('bomgourmet_2F2021_2F05_2F24202047_2Fhamburguer-janelabar-divulgacao.jpg') ||
+      normalized.endsWith('hamb.gourmet.jpg')
+    ) {
+      return fallback;
+    }
+
+    return image;
+  }
   function normalizeForMatch(value){
     return normalizeText(value)
       .normalize('NFD')
@@ -121,10 +169,19 @@
 
   function normalizeCategory(value){
     const category = normalizeText(value);
-    if (normalizeForMatch(category) === 'acai') return 'Açaí';
+    const match = normalizeForMatch(category);
+    if (match === 'hamburgueres gourmet' || match === 'hamburguer gourmet' || match === 'gourmet') {
+      return 'Hambúrgueres Gourmet';
+    }
+    if (match === 'hamburgueres' || match === 'hamburguer tradicional' || match === 'hamburgueres tradicionais') {
+      return 'Hambúrgueres';
+    }
+    if (match === 'pizzas' || match === 'pizza') return 'Pizzas';
+    if (match === 'doces' || match === 'pizza doce' || match === 'pizzas doces') return 'Pizzas Doces';
+    if (match === 'porcoes' || match === 'porcao') return 'Porções';
+    if (match === 'acai') return 'Açaí';
     return category || 'Outros';
   }
-
   function normalizeProductOrigin(value){
     return value === 'padrao' ? 'padrao' : 'admin';
   }
@@ -158,11 +215,11 @@
 
     return {
       id: String(src.id || uid('P')),
-      nome: normalizeText(src.nome || src.title || ''),
-      descricao: normalizeText(src.descricao || src.desc || ''),
+      nome: normalizeText(src.nome || src.name || src.title || ''),
+      descricao: normalizeText(src.descricao || src.description || src.desc || ''),
       preco: toNumber(src.preco ?? src.price, 0),
       categoria: normalizeCategory(src.categoria || src.category || ''),
-      imagem: normalizeText(src.imagem || src.image || defaultImage) || defaultImage,
+      imagem: normalizeImagePath(src.imagem || src.image, defaultImage),
       disponivel: src.disponivel !== false,
       origem: normalizeProductOrigin(src.origem),
       criadoEm: createdAt,
@@ -175,24 +232,77 @@
     return `${normalizeForMatch(product?.nome)}::${normalizeForMatch(product?.categoria)}`;
   }
 
-  function normalizeProductsList(list){
-    const raw = Array.isArray(list) ? list : [];
-    return raw
-      .map(normalizeProduct)
-      .filter((product) => !isOutroProductName(product.nome));
+  function hasDefaultProductId(product){
+    return produtosObrigatoriosCardapio.has(String(product?.id || ''));
   }
 
+  function productCompletenessScore(product){
+    let score = 0;
+    if (normalizeText(product?.descricao)) score += 1;
+    if (Number(product?.preco) > 0) score += 1;
+    if (normalizeText(product?.imagem) && product.imagem !== defaultImage) score += 1;
+    if (product?.disponivel !== false) score += 1;
+    return score;
+  }
+
+  function shouldReplaceDuplicateProduct(current, candidate){
+    if (hasDefaultProductId(candidate) !== hasDefaultProductId(current)) {
+      return hasDefaultProductId(candidate);
+    }
+    if ((candidate?.origem === 'padrao') !== (current?.origem === 'padrao')) {
+      return candidate?.origem === 'padrao';
+    }
+    return productCompletenessScore(candidate) > productCompletenessScore(current);
+  }
+
+  function dedupeProductsList(list){
+    const result = [];
+    const indexById = new Map();
+    const indexByMatch = new Map();
+
+    list.forEach((product) => {
+      const idKey = normalizeText(product.id);
+      const matchKey = productMatchKey(product);
+      const hasMatchKey = matchKey !== '::';
+      const existingIndex = indexById.has(idKey)
+        ? indexById.get(idKey)
+        : (hasMatchKey ? indexByMatch.get(matchKey) : undefined);
+
+      if (existingIndex !== undefined) {
+        if (shouldReplaceDuplicateProduct(result[existingIndex], product)) {
+          result[existingIndex] = product;
+        }
+        if (idKey) indexById.set(idKey, existingIndex);
+        if (hasMatchKey) indexByMatch.set(matchKey, existingIndex);
+        return;
+      }
+
+      const nextIndex = result.push(product) - 1;
+      if (idKey) indexById.set(idKey, nextIndex);
+      if (hasMatchKey) indexByMatch.set(matchKey, nextIndex);
+    });
+
+    return result;
+  }
+
+  function normalizeProductsList(list){
+    const raw = Array.isArray(list) ? list : [];
+    const normalized = raw
+      .map(normalizeProduct)
+      .filter((product) => !isOutroProductName(product.nome));
+    return dedupeProductsList(normalized);
+  }
   function normalizePromo(raw){
     const src = raw && typeof raw === 'object' ? raw : {};
     const oldStyle = src.estilo || src.tipo || '';
 
     return {
       id: String(src.id || uid('PR')),
-      nome: normalizeText(src.nome || src.titulo || src.title || ''),
-      descricao: normalizeText(src.descricao || src.desc || ''),
+      nome: normalizeText(src.nome || src.name || src.titulo || src.title || ''),
+      descricao: normalizeText(src.descricao || src.description || src.desc || ''),
       precoPromocional: toNumber(src.precoPromocional ?? src.preco ?? src.price, 0),
       estiloPromocao: normalizePromoStyle(src.estiloPromocao || oldStyle),
-      imagem: normalizeText(src.imagem || src.image || 'img/hamb.gourmet.jpg') || 'img/hamb.gourmet.jpg',
+      imagem: normalizeImagePath(src.imagem || src.image, 'img/img-header.png'),
       ativa: src.ativa !== undefined ? !!src.ativa : (src.ativo !== undefined ? !!src.ativo : true),
       mostrarNoCardapioGeral: src.mostrarNoCardapioGeral !== undefined ? !!src.mostrarNoCardapioGeral : false,
       criadoEm: src.criadoEm || todayISO()
