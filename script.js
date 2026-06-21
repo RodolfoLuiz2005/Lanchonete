@@ -446,6 +446,8 @@ const cartItemsContainer = document.getElementById('cart-items');
 const cartTotal = document.getElementById('cart-total');
 const finalizeButton = document.getElementById('btn-finalize');
 const cartOrderSummary = document.getElementById('cart-order-summary');
+const appToast = document.getElementById('app-toast');
+let toastTimer = null;
 const MAX_ACAI_ACOMPANHAMENTOS = 7;
 
 let currentQty = 1;
@@ -559,6 +561,32 @@ function updateCartCount() {
     const cart = getCart();
     const totalQty = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
     cartCount.textContent = totalQty;
+}
+
+function showToast(message) {
+    if (!appToast) {
+        alert(message);
+        return;
+    }
+
+    window.clearTimeout(toastTimer);
+    appToast.textContent = message;
+    appToast.hidden = false;
+    window.requestAnimationFrame(() => appToast.classList.add('active'));
+
+    toastTimer = window.setTimeout(() => {
+        appToast.classList.remove('active');
+        window.setTimeout(() => {
+            appToast.hidden = true;
+        }, 240);
+    }, 2300);
+}
+
+function pulseCartButton() {
+    if (!cartButton) return;
+    cartButton.classList.remove('cart-bump');
+    void cartButton.offsetWidth;
+    cartButton.classList.add('cart-bump');
 }
 
 function getProductFromCard(card) {
@@ -914,7 +942,8 @@ if (addToCartBtn) {
         addToCart(produtoFinal, currentQty);
         closeModal();
 
-        alert(`${currentQty}x ${productTitle} adicionado ao carrinho`);
+        pulseCartButton();
+        showToast(`${currentQty}x ${productTitle} adicionado ao carrinho`);
     });
 }
 
@@ -954,6 +983,50 @@ function setupMenuCardReveal() {
 }
 
 setupMenuCardReveal();
+function setupCategoryNavigation() {
+    const navLinks = [...document.querySelectorAll('.carrossel-cards a[href^="#"]')];
+    const headings = navLinks
+        .map((link) => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
+
+    if (!navLinks.length || !headings.length) return;
+
+    const setActiveCategory = (id) => {
+        navLinks.forEach((link) => {
+            link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
+        });
+    };
+
+    navLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+            const id = link.getAttribute('href').slice(1);
+            if (id) setActiveCategory(id);
+        });
+    });
+
+    if (!('IntersectionObserver' in window)) {
+        setActiveCategory(headings[0].id);
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible && visible.target.id) {
+            setActiveCategory(visible.target.id);
+        }
+    }, {
+        rootMargin: '-15% 0px -68% 0px',
+        threshold: [0.05, 0.2, 0.45]
+    });
+
+    headings.forEach((heading) => observer.observe(heading));
+    setActiveCategory(headings[0].id);
+}
+
+setupCategoryNavigation();
 window.addEventListener('focus', setupMenuCardReveal);
 window.addEventListener('pageshow', setupMenuCardReveal);
 window.addEventListener('mk-promos-updated', setupMenuCardReveal);

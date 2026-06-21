@@ -133,6 +133,42 @@
 
   const produtosObrigatoriosCardapio = new Set(produtosPadrao.map((product) => String(product.id)));
 
+
+  const promocoesPadrao = [
+    {
+      id: 'promo-combo-pizza-refri',
+      nome: 'Combo Pizza + Refrigerante',
+      descricao: 'Pizza grande selecionada com refrigerante para compartilhar.',
+      precoPromocional: 59.99,
+      estiloPromocao: 'combo',
+      imagem: defaultImage,
+      ativa: true,
+      mostrarNoCardapioGeral: true,
+      criadoEm: todayISO()
+    },
+    {
+      id: 'promo-hamburguer-batata',
+      nome: 'Combo Hambúrguer + Batata',
+      descricao: 'Hambúrguer da casa com batata frita crocante.',
+      precoPromocional: 24.99,
+      estiloPromocao: 'destaque',
+      imagem: gourmetImage,
+      ativa: true,
+      mostrarNoCardapioGeral: true,
+      criadoEm: todayISO()
+    },
+    {
+      id: 'promo-acai-cremoso',
+      nome: 'Açaí Cremoso da Casa',
+      descricao: 'Açaí com acompanhamentos e calda à escolha.',
+      precoPromocional: 14.99,
+      estiloPromocao: 'desconto',
+      imagem: defaultImage,
+      ativa: true,
+      mostrarNoCardapioGeral: true,
+      criadoEm: todayISO()
+    }
+  ];
   const promoStyles = ['desconto', 'combo', 'clone', 'destaque'];
 
   function toNumber(value, fallback = 0){
@@ -435,7 +471,7 @@
 
     if(!localStorage.getItem(STORAGE_KEYS.promos)) {
       const legacy = read(STORAGE_KEYS.promosLegacy, []);
-      write(STORAGE_KEYS.promos, Array.isArray(legacy) ? legacy : []);
+      write(STORAGE_KEYS.promos, Array.isArray(legacy) && legacy.length ? legacy : promocoesPadrao);
     }
 
     const legacyConfig = read(STORAGE_KEYS.config, {});

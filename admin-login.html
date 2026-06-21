@@ -16,7 +16,7 @@
     </section>
     <form class="login-box" id="login-form">
       <h2>Acessar painel</h2>
-      <label>Usuário<input id="login-user" autocomplete="username" placeholder="admin" required></label>
+      <label>Usuário<input id="login-user" autocomplete="username" placeholder="Usuário" required></label>
       <label>Senha<input id="login-pass" type="password" autocomplete="current-password" placeholder="*****" required></label>
       <button type="submit">Entrar</button>
 
@@ -47,7 +47,7 @@
 
       const ok = (window.MKStore && typeof MKStore.verifyAdminCredentials === 'function')
         ? MKStore.verifyAdminCredentials(username, password)
-        : (username === 'admin' && password === '123456');
+        : false;
 
       if (ok) {
         sessionStorage.setItem('mk_admin_auth', 'ok');

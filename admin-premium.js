@@ -314,7 +314,7 @@ function renderProducts() {
           <small>${escapeHtml(normalizeCategory(p.categoria))} | ${p.disponivel !== false ? 'Disponível' : 'Indisponível'} | ${p.origem === 'padrao' ? 'Padrão' : 'Admin'}</small>
         </div>
         <strong>${money(p.preco)}</strong>
-        <span class="badge">${p.disponivel !== false ? 'Ativo' : 'Inativo'}</span>
+        <span class="badge ${p.disponivel !== false ? 'badge--success' : 'badge--muted'}">${p.disponivel !== false ? 'Ativo' : 'Inativo'}</span>
         <div class="row-actions">
           <button class="ghost" onclick="editProduct('${pid}')">Editar</button>
           <button class="ghost" onclick="toggleProduct('${pid}')">${p.disponivel !== false ? 'Desativar' : 'Ativar'}</button>
@@ -478,7 +478,7 @@ function renderPromos() {
           <small>${p.mostrarNoCardapioGeral ? ' | Também no cardápio geral' : ''}</small>
         </div>
         <strong>${money(p.precoPromocional)}</strong>
-        <span class="badge">${p.ativa ? 'Ativa' : 'Inativa'}</span>
+        <span class="badge ${p.ativa ? 'badge--success' : 'badge--muted'}">${p.ativa ? 'Ativa' : 'Inativa'}</span>
         <div class="row-actions">
           <button class="ghost" onclick="editPromo('${pid}')">Editar</button>
           <button class="ghost" onclick="togglePromoStatus('${pid}')">${p.ativa ? 'Desativar' : 'Ativar'}</button>
@@ -584,7 +584,7 @@ function renderOrders() {
               ${orderItemsHtml(o)}
             </div>
             <strong>${money(item.total)}</strong>
-            <span class="badge">${escapeHtml(item.status || 'aguardando')}</span>
+            <span class="badge status-${escapeHtml(item.status || 'aguardando')}">${escapeHtml(item.status || 'aguardando')}</span>
             <div class="row-actions">
               <button class="ghost" onclick="printOrder('${oid}')">Imprimir</button>
               <button class="ghost" onclick="advanceOrder('${oid}')">Avançar</button>
@@ -799,5 +799,3 @@ window.addEventListener('storage', (event) => {
   }
 });
 setProductImagePreview(PRODUCT_IMAGE_PLACEHOLDER);
-
-

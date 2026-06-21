@@ -19,11 +19,34 @@
   let soundEnabled = false;
   let lastIds = new Set();
   let renderTimer = null;
+  let currentKitchenFilter = 'todos';
 
   function isKitchenAuthenticated() {
     return sessionStorage.getItem(KITCHEN_AUTH_KEY) === 'ok';
   }
 
+
+  function setKitchenFilter(filter) {
+    currentKitchenFilter = STATUS_FLOW.includes(filter) ? filter : 'todos';
+    const board = document.querySelector('.kitchen-board');
+    if (board) board.dataset.kitchenFilter = currentKitchenFilter;
+
+    document.querySelectorAll('#kitchen-status-tabs [data-filter]').forEach((button) => {
+      button.classList.toggle('active', button.dataset.filter === currentKitchenFilter);
+    });
+  }
+
+  function updateKitchenTabs(orders) {
+    const counts = { todos: orders.length };
+    STATUS_FLOW.forEach((status) => {
+      counts[status] = orders.filter((order) => normalizeStatus(order.status) === status).length;
+    });
+
+    document.querySelectorAll('#kitchen-status-tabs [data-filter]').forEach((button) => {
+      const counter = button.querySelector('span');
+      if (counter) counter.textContent = counts[button.dataset.filter] ?? 0;
+    });
+  }
   function setKitchenLocked(locked) {
     document.body.classList.toggle('kitchen-locked', locked);
     document.querySelector('.kitchen-top')?.setAttribute('aria-hidden', locked ? 'true' : 'false');
@@ -352,6 +375,8 @@
     const list = getNormalizedOrders();
     const ids = new Set(list.map((order) => String(order.id)));
     const hasNew = list.some((order) => !lastIds.has(String(order.id)) && normalizeStatus(order.status) === 'aguardando');
+    updateKitchenTabs(list);
+    setKitchenFilter(currentKitchenFilter);
 
     clearColumns();
     if (hasNew) beep();
@@ -376,6 +401,7 @@
 
       card.innerHTML = `
         <header><strong>#${escapeHtml(order.codigo || order.id)}</strong><span>${money(order.total)}</span></header>
+        <span class="status-badge status-${status}">${STATUS_LABELS[status]}</span>
         <div class="meta"><span class="tag">${typeLabel(order)}</span>${mesa ? `<span class="tag">Mesa ${escapeHtml(mesa)}</span>` : ''}${ageTag(order)}</div>
         <p><strong>Cliente:</strong> ${escapeHtml(order.cliente || 'Cliente')}</p>
         ${renderOrderDetailsHtml(order)}

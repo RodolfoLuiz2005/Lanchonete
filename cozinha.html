@@ -40,7 +40,15 @@
     </div>
   </header>
 
-  <main class="kitchen-board">
+
+  <nav class="kitchen-status-tabs" id="kitchen-status-tabs" aria-label="Filtrar pedidos por status">
+    <button type="button" class="active" data-filter="todos">Todos <span>0</span></button>
+    <button type="button" data-filter="aguardando">Aguardando <span>0</span></button>
+    <button type="button" data-filter="preparando">Preparando <span>0</span></button>
+    <button type="button" data-filter="pronto">Prontos <span>0</span></button>
+    <button type="button" data-filter="entregue">Entregues <span>0</span></button>
+  </nav>
+  <main class="kitchen-board" data-kitchen-filter="todos">
     <section class="k-col" id="aguardando"><h2>Aguardando</h2></section>
     <section class="k-col" id="preparando"><h2>Preparando</h2></section>
     <section class="k-col" id="pronto"><h2>Prontos</h2></section>
