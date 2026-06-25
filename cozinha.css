@@ -401,6 +401,20 @@ button:hover {
   background: var(--color-accent);
   color: var(--color-primary-dark);
 }
+.kitchen-sound-status {
+  align-self: center;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  color: #fff8df;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.kitchen-sound-status.active {
+  background: rgba(27, 120, 77, 0.22);
+  border-color: rgba(190, 255, 218, 0.58);
+}
 
 .kitchen-status-tabs {
   position: sticky;

@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <title>MK Lanchonete</title>
+    <title>RL Lanchonete</title>
 </head>
 
 <body>
@@ -54,7 +54,7 @@
             <div class="overlay-menu" id="overlay-menu"></div>
             <div class="hero-content">
                 <span class="hero-eyebrow">Pedidos rápidos para hoje</span>
-                <h1>MK Lanchonete</h1>
+                <h1>RL Lanchonete</h1>
                 <p>Pizzas, hambúrgueres, açaí e porções no capricho.</p>
                 <div class="hero-actions">
                     <a class="hero-link secondary" href="#cardapio">
@@ -68,6 +68,10 @@
                     <button id="btn-pedir-retirar">
                         <i class="bi bi-geo-alt"></i>
                         Peça e retire
+                    </button>
+                    <button id="btn-track-order" type="button">
+                        <i class="bi bi-search"></i>
+                        Acompanhar pedido
                     </button>
                 </div>
             </div>
@@ -105,11 +109,6 @@
                         </a>
                     </div>
                     <div>
-                        <a href="#bordas-recheadas">
-                            <p>Bordas</p>
-                        </a>
-                    </div>
-                    <div>
                         <a href="#hamburgueres">
                             <p>Hambúrgueres</p>
                         </a>
@@ -127,11 +126,6 @@
                     <div>
                         <a href="#porcoes">
                             <p>Porções</p>
-                        </a>
-                    </div>
-                    <div>
-                        <a href="#adicionais">
-                            <p>Adicionais</p>
                         </a>
                     </div>
                     <div>
@@ -292,23 +286,6 @@
                     </a>
                 </div>
 
-                <h2 id="bordas-recheadas">Bordas Recheadas:</h2>
-                <div class="flex-cards">
-                    <a href="#" data-category="bordas-recheadas"><img src="img/img-header.png" alt="Borda de Catupiry">
-                        <div class="card-info">
-                            <h2>Borda de Catupiry</h2>
-                            <p>Borda recheada com catupiry cremoso.</p>
-                            <h4>R$ 14,99</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="bordas-recheadas"><img src="img/img-header.png" alt="Borda de Cheddar">
-                        <div class="card-info">
-                            <h2>Borda de Cheddar</h2>
-                            <p>Borda recheada com cheddar cremoso.</p>
-                            <h4>R$ 14,99</h4>
-                        </div>
-                    </a>
-                </div>
 
                 <h2 id="hamburgueres">Hambúrgueres:</h2>
                 <div class="flex-cards">
@@ -508,59 +485,6 @@
                     </a>
                 </div>
 
-                <h2 id="adicionais">Adicionais:</h2>
-                <div class="flex-cards">
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Bacon">
-                        <div class="card-info">
-                            <h2>Adicional de Bacon</h2>
-                            <p>Porção extra de bacon para complementar seu lanche.</p>
-                            <h4>R$ 6,00</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Calabresa">
-                        <div class="card-info">
-                            <h2>Adicional de Calabresa</h2>
-                            <p>Porção extra de calabresa.</p>
-                            <h4>R$ 6,00</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Carne">
-                        <div class="card-info">
-                            <h2>Adicional de Carne</h2>
-                            <p>Porção extra de carne.</p>
-                            <h4>R$ 7,00</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png"
-                            alt="Adicional de Carne de Sol">
-                        <div class="card-info">
-                            <h2>Adicional de Carne de Sol</h2>
-                            <p>Porção extra de carne de sol.</p>
-                            <h4>R$ 9,99</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Ovo">
-                        <div class="card-info">
-                            <h2>Adicional de Ovo</h2>
-                            <p>Ovo extra para complementar seu lanche.</p>
-                            <h4>R$ 2,00</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Queijo">
-                        <div class="card-info">
-                            <h2>Adicional de Queijo</h2>
-                            <p>Porção extra de queijo.</p>
-                            <h4>R$ 4,00</h4>
-                        </div>
-                    </a>
-                    <a href="#" data-category="adicionais"><img src="img/img-header.png" alt="Adicional de Salsicha">
-                        <div class="card-info">
-                            <h2>Adicional de Salsicha</h2>
-                            <p>Porção extra de salsicha.</p>
-                            <h4>R$ 3,00</h4>
-                        </div>
-                    </a>
-                </div>
 
                 <h2 id="sorvete">Sorvete:</h2>
                 <div class="flex-cards">
@@ -834,6 +758,25 @@
         </div>
         <div class="cart-footer">
             <div class="cart-total">Total: <span id="cart-total">R$ 0,00</span></div>
+            <div class="payment-section" id="payment-section">
+                <label for="payment-type">Tipo de pagamento</label>
+                <select id="payment-type" required>
+                    <option value="">Escolha uma op&ccedil;&atilde;o</option>
+                    <option value="pix">Pix</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="credito">Cart&atilde;o de cr&eacute;dito</option>
+                    <option value="debito">Cart&atilde;o de d&eacute;bito</option>
+                </select>
+                <div class="cash-change-options" id="cash-change-options" hidden>
+                    <span>Precisa de troco?</span>
+                    <label><input type="radio" name="needs-change" value="sim"> Sim</label>
+                    <label><input type="radio" name="needs-change" value="nao"> N&atilde;o</label>
+                    <label class="change-amount-field" id="change-amount-field" hidden>
+                        Troco para quanto?
+                        <input type="text" id="change-amount" inputmode="decimal" placeholder="Ex: 100,00">
+                    </label>
+                </div>
+            </div>
             <button class="btn-finalize" id="btn-finalize" type="button">Finalizar pedido</button>
         </div>
     </aside>
@@ -858,6 +801,33 @@
                 <p id="modal-desc"></p>
 
                 <div class="modal-price" id="modal-price"></div>
+                <div class="product-extra-container" id="pizza-border-container" hidden>
+                    <h3>Borda recheada</h3>
+                    <label><input type="radio" name="pizza-border" value="" data-price="0" checked> Sem borda - R$
+                        0,00</label>
+                    <label><input type="radio" name="pizza-border" value="Borda de Catupiry" data-price="14.99"> Borda
+                        de Catupiry - R$ 14,99</label>
+                    <label><input type="radio" name="pizza-border" value="Borda de Cheddar" data-price="14.99"> Borda de
+                        Cheddar - R$ 14,99</label>
+                </div>
+
+                <div class="product-extra-container" id="burger-addons-container" hidden>
+                    <h3>Adicionais</h3>
+                    <label><input type="checkbox" class="burger-adicional" data-price="6" value="Bacon"> Bacon - R$
+                        6,00</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="6" value="Calabresa"> Calabresa -
+                        R$ 6,00</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="7" value="Carne"> Carne - R$
+                        7,00</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="9.99" value="Carne de Sol"> Carne
+                        de Sol - R$ 9,99</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="2" value="Ovo"> Ovo - R$
+                        2,00</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="4" value="Queijo"> Queijo - R$
+                        4,00</label>
+                    <label><input type="checkbox" class="burger-adicional" data-price="3" value="Salsicha"> Salsicha -
+                        R$ 3,00</label>
+                </div>
 
                 <!-- Opções do Açaí -->
                 <div class="extras-container" id="extras-container">
@@ -946,6 +916,36 @@
         <h2 id="order-intake-title">Dados do pedido</h2>
         <div id="order-intake-body"></div>
     </div>
+
+    <!-- Modal acompanhamento do pedido -->
+    <div class="order-tracking-overlay" id="order-tracking-overlay" hidden></div>
+    <div class="order-tracking-modal" id="order-tracking-modal" aria-hidden="true" hidden>
+        <button class="order-tracking-close" id="order-tracking-close" aria-label="Fechar">X</button>
+        <h2>Acompanhar pedido</h2>
+        <form class="order-tracking-form" id="order-tracking-form">
+            <label for="order-tracking-code">C&oacute;digo do pedido</label>
+            <div>
+                <input id="order-tracking-code" name="codigo" placeholder="Ex: MK123456" required>
+                <button type="submit">Consultar</button>
+            </div>
+        </form>
+        <p class="order-tracking-message" id="order-tracking-message" role="status" aria-live="polite"></p>
+        <div class="order-tracking-result" id="order-tracking-result"></div>
+    </div>
+    <div class="order-success-overlay" id="order-success-overlay" hidden></div>
+    <section class="order-success-modal" id="order-success-modal" aria-hidden="true" aria-labelledby="order-success-title" role="dialog" hidden>
+        <button class="order-success-close" id="order-success-close" type="button" aria-label="Fechar">X</button>
+        <div class="order-success-icon" aria-hidden="true">OK</div>
+        <h2 id="order-success-title">Pedido realizado com sucesso!</h2>
+        <p>Guarde este c&oacute;digo para acompanhar o status do seu pedido.</p>
+        <strong class="order-success-code" id="order-success-code">MK000000</strong>
+        <p class="order-success-feedback" id="order-success-feedback" role="status" aria-live="polite"></p>
+        <div class="order-success-actions">
+            <button class="copy" id="order-success-copy" type="button">Copiar c&oacute;digo</button>
+            <button class="whatsapp" id="order-success-whatsapp" type="button">Enviar c&oacute;digo pelo WhatsApp</button>
+            <button class="close" id="order-success-close-secondary" type="button">Fechar</button>
+        </div>
+    </section>
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 

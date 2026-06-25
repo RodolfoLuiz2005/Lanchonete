@@ -2,27 +2,57 @@
   const KITCHEN_AUTH_KEY = 'mk_cozinha_auth';
   const KITCHEN_USER = 'cozinha';
   const KITCHEN_PASSWORD = '123456';
-  const STATUS_FLOW = ['aguardando', 'preparando', 'pronto', 'entregue'];
+  const STATUS_FLOW = ['aguardando', 'preparando', 'pronto', 'entregue', 'cancelado'];
   const STATUS_LABELS = {
     aguardando: 'Aguardando',
     preparando: 'Preparando',
     pronto: 'Prontos',
-    entregue: 'Entregues'
+    entregue: 'Entregues',
+    cancelado: 'Cancelado'
   };
   const LEGACY_STATUS = {
     recebidos: 'aguardando',
     entrega: 'entregue',
     finalizado: 'entregue',
-    finalizados: 'entregue'
+    finalizados: 'entregue',
+    cancelado: 'cancelado'
   };
 
   let soundEnabled = false;
+  let audioContext = null;
+  let knownOrderKeys = new Set();
   let lastIds = new Set();
   let renderTimer = null;
   let currentKitchenFilter = 'todos';
 
   function isKitchenAuthenticated() {
     return sessionStorage.getItem(KITCHEN_AUTH_KEY) === 'ok';
+  }
+  function orderKey(order) {
+    return String(order?.codigo || order?.id || '').trim();
+  }
+
+  function updateSoundStatus() {
+    const status = document.getElementById('kitchen-sound-status');
+    const button = document.getElementById('enable-sound');
+    if (status) {
+      status.textContent = soundEnabled
+        ? 'Som ativado. Novos pedidos tocarão um aviso.'
+        : 'Som desativado. Clique para ativar notificações sonoras.';
+      status.classList.toggle('active', soundEnabled);
+    }
+    if (button) {
+      button.innerHTML = soundEnabled
+        ? '<i class="bi bi-volume-up-fill"></i> Som ativado'
+        : '<i class="bi bi-volume-up"></i> Ativar som';
+    }
+  }
+
+  function rememberKnownOrders(orders) {
+    orders.forEach((order) => {
+      const key = orderKey(order);
+      if (key) knownOrderKeys.add(key);
+    });
   }
 
 
@@ -89,6 +119,7 @@
       renderTimer = null;
     }
     lastIds = new Set();
+    knownOrderKeys = new Set();
     setKitchenLocked(true);
     clearColumns();
     showLoginError('');
@@ -102,8 +133,12 @@
     }
 
     setKitchenLocked(false);
-    lastIds = new Set(readOrders().map((order) => String(order.id)));
-    render();
+    updateSoundStatus();
+    const initialOrders = getNormalizedOrders();
+    lastIds = new Set(initialOrders.map((order) => String(order.id)));
+    knownOrderKeys = new Set();
+    rememberKnownOrders(initialOrders);
+    render(initialOrders);
 
     if (!renderTimer) {
       renderTimer = setInterval(render, 3000);
@@ -227,6 +262,24 @@
     return order.mesa || orderInfo(order).numeroMesa || '';
   }
 
+  function paymentFromOrder(order) {
+    const raw = order?.pagamento || orderInfo(order).pagamento || null;
+    if (raw && typeof raw === 'object') {
+      const label = raw.label || order.tipoPagamento || raw.tipo || '';
+      if (!label) return '';
+      if (String(raw.tipo || '').toLowerCase() === 'dinheiro') {
+        return raw.precisaTroco && raw.trocoPara ? `${label} - Troco para ${raw.trocoPara}` : `${label} - Sem troco`;
+      }
+      return label;
+    }
+
+    const label = order?.tipoPagamento || '';
+    if (!label) return '';
+    if (String(label).toLowerCase() === 'dinheiro') {
+      return order.precisaTroco && order.trocoPara ? `${label} - Troco para ${order.trocoPara}` : `${label} - Sem troco`;
+    }
+    return label;
+  }
   function normalizeItems(order) {
     if (Array.isArray(order?.itens)) {
       return order?.itens.map((item) => String(item || '').trim()).filter(Boolean);
@@ -279,27 +332,38 @@
     return orders;
   }
 
+  function ensureAudioContext() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!audioContext) audioContext = new AudioContextClass();
+    return audioContext;
+  }
+
   function beep() {
-    if (!soundEnabled) return;
+    if (!soundEnabled) return false;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = ensureAudioContext();
+      if (!ctx) return false;
+      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+        ctx.resume();
+      }
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.value = 880;
-      gain.gain.value = 0.15;
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.34);
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start();
-      setTimeout(() => {
-        osc.stop();
-        ctx.close();
-      }, 240);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.36);
+      return true;
     } catch (error) {
-      // Som e bloqueio de autoplay variam por navegador.
+      return false;
     }
   }
-
   function ageTag(order) {
     const time = new Date(order.criadoEm || order.id || Date.now()).getTime();
     const min = Math.max(0, Math.floor((Date.now() - time) / 60000));
@@ -329,6 +393,8 @@
     const obs = orderNotes(order);
     if (obs) details.push(`<p><strong>Observação:</strong> ${escapeHtml(obs)}</p>`);
 
+    const payment = paymentFromOrder(order);
+    if (payment) details.push(`<p><strong>Pagamento:</strong> ${escapeHtml(payment)}</p>`);
     return details.join('');
   }
 
@@ -352,6 +418,8 @@
     if (tipo === 'retirada' && horario) lines.push(`Retirada: ${horario}`);
     if (obs) lines.push(`Obs: ${obs}`);
 
+    const payment = paymentFromOrder(order);
+    if (payment) lines.push(`Pagamento: ${payment}`);
     lines.push('------------------------');
     lines.push(...(order?.itens || []));
     lines.push('------------------------');
@@ -369,17 +437,20 @@
     });
   }
 
-  function render() {
+  function render(currentOrders = null) {
     if (!isKitchenAuthenticated()) return;
 
-    const list = getNormalizedOrders();
+    const list = Array.isArray(currentOrders) ? currentOrders : getNormalizedOrders();
     const ids = new Set(list.map((order) => String(order.id)));
-    const hasNew = list.some((order) => !lastIds.has(String(order.id)) && normalizeStatus(order.status) === 'aguardando');
+    const newPendingOrders = list.filter((order) => {
+      const key = orderKey(order);
+      return key && !knownOrderKeys.has(key) && normalizeStatus(order.status) === 'aguardando';
+    });
     updateKitchenTabs(list);
     setKitchenFilter(currentKitchenFilter);
 
     clearColumns();
-    if (hasNew) beep();
+    if (newPendingOrders.length) beep();
 
     list.forEach((order) => {
       const status = normalizeStatus(order.status);
@@ -391,8 +462,9 @@
 
       const mesa = orderTable(order);
       const safeId = escapeHtml(order.id);
+      const key = orderKey(order);
       const card = document.createElement('article');
-      card.className = `k-card ${!lastIds.has(String(order.id)) ? 'new' : ''}`;
+      card.className = `k-card ${key && !knownOrderKeys.has(key) ? 'new' : ''}`;
       card.dataset.orderId = String(order.id);
 
       const items = order?.itens.length
@@ -407,8 +479,8 @@
         ${renderOrderDetailsHtml(order)}
         <ul>${items}</ul>
         <div class="k-actions">
-          <button class="print" type="button" data-print="${safeId}">Imprimir</button>
-          ${status !== 'entregue' ? `<button class="done" type="button" data-advance="${safeId}">Avançar</button>` : ''}
+          ${status === 'aguardando' ? `<button class="print" type="button" data-print="${safeId}">Imprimir</button>` : ''}
+          ${!['entregue', 'cancelado'].includes(status) ? `<button class="done" type="button" data-advance="${safeId}">Avançar</button>` : ''}
         </div>
       `;
 
@@ -416,8 +488,8 @@
     });
 
     lastIds = ids;
+    rememberKnownOrders(list);
   }
-
   function advance(id) {
     const list = getNormalizedOrders();
     const order = list.find((item) => String(item.id) === String(id));
@@ -468,10 +540,12 @@
 
   document.getElementById('enable-sound')?.addEventListener('click', () => {
     soundEnabled = true;
-    beep();
-    alert('Som ativado. A cozinha tocará um alerta quando chegar pedido novo.');
+    const ctx = ensureAudioContext();
+    if (ctx?.state === 'suspended' && typeof ctx.resume === 'function') {
+      ctx.resume();
+    }
+    updateSoundStatus();
   });
-
   document.getElementById('btn-limpar-finalizados')?.addEventListener('click', clearDelivered);
   document.getElementById('kitchen-login-form')?.addEventListener('submit', handleKitchenLogin);
   document.getElementById('kitchen-logout')?.addEventListener('click', logoutKitchen);
@@ -485,6 +559,7 @@
 
   window.advanceKitchenOrder = advance;
   window.printKitchenOrder = printOrder;
+  updateSoundStatus();
 
   if (isKitchenAuthenticated()) {
     startKitchenPanel();

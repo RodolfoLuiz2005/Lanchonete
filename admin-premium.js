@@ -171,6 +171,25 @@ function formatAddress(order) {
   return safeOrder(order).endereco || '';
 }
 
+function paymentFromOrder(order) {
+  const item = safeOrder(order);
+  const raw = item.pagamento || orderInfo(item).pagamento || null;
+  if (raw && typeof raw === 'object') {
+    const label = raw.label || item.tipoPagamento || raw.tipo || '';
+    if (!label) return '';
+    if (String(raw.tipo || '').toLowerCase() === 'dinheiro') {
+      return raw.precisaTroco && raw.trocoPara ? `${label} - Troco para ${raw.trocoPara}` : `${label} - Sem troco`;
+    }
+    return label;
+  }
+
+  const label = item.tipoPagamento || '';
+  if (!label) return '';
+  if (String(label).toLowerCase() === 'dinheiro') {
+    return item.precisaTroco && item.trocoPara ? `${label} - Troco para ${item.trocoPara}` : `${label} - Sem troco`;
+  }
+  return label;
+}
 function orderDetailsHtml(order) {
   const detalhes = [];
   const phone = orderPhone(order);
@@ -191,6 +210,8 @@ function orderDetailsHtml(order) {
   const obs = orderNotes(order);
   if (obs) detalhes.push(`<small>Obs: ${escapeHtml(obs)}</small>`);
 
+  const payment = paymentFromOrder(order);
+  if (payment) detalhes.push(`<small>Pagamento: ${escapeHtml(payment)}</small>`);
   return detalhes.join('<br>');
 }
 
@@ -221,6 +242,8 @@ function buildOrderPrintText(order) {
   if (tipo === 'retirada' && retirada) lines.push(`Retirada: ${retirada}`);
   if (obs) lines.push(`Obs: ${obs}`);
 
+  const payment = paymentFromOrder(order);
+  if (payment) lines.push(`Pagamento: ${payment}`);
   lines.push('------------------------');
   lines.push(...(Array.isArray(item.itens) ? item.itens : []));
   lines.push('------------------------');

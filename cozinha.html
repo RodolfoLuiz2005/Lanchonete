@@ -33,6 +33,7 @@
     <div class="top-actions">
 
       <button id="enable-sound" type="button"><i class="bi bi-volume-up"></i> Ativar som</button>
+      <span class="kitchen-sound-status" id="kitchen-sound-status">Som desativado. Clique para ativar notificações sonoras.</span>
       <button id="btn-limpar-finalizados" type="button">
         <i class="bi bi-trash3"></i> Limpar entregues
       </button>
@@ -47,12 +48,14 @@
     <button type="button" data-filter="preparando">Preparando <span>0</span></button>
     <button type="button" data-filter="pronto">Prontos <span>0</span></button>
     <button type="button" data-filter="entregue">Entregues <span>0</span></button>
+    <button type="button" data-filter="cancelado">Cancelados <span>0</span></button>
   </nav>
   <main class="kitchen-board" data-kitchen-filter="todos">
     <section class="k-col" id="aguardando"><h2>Aguardando</h2></section>
     <section class="k-col" id="preparando"><h2>Preparando</h2></section>
     <section class="k-col" id="pronto"><h2>Prontos</h2></section>
     <section class="k-col" id="entregue"><h2>Entregues</h2></section>
+    <section class="k-col" id="cancelado"><h2>Cancelados</h2></section>
   </main>
 
   

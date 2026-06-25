@@ -73,6 +73,7 @@ if (menu) {
 }
 
 const ORDER_CONTEXT_KEY = 'mk_order_context';
+const WHATSAPP_NUMBER = '5581999999999';
 
 function getOrderContext() {
     try {
@@ -124,6 +125,37 @@ function buildAddressLine(endereco) {
     if (!linhaPrincipal) return complementares;
     if (!complementares) return linhaPrincipal;
     return `${linhaPrincipal} | ${complementares}`;
+}
+
+const PAYMENT_LABELS = {
+    pix: 'Pix',
+    dinheiro: 'Dinheiro',
+    credito: 'Cart\u00e3o de cr\u00e9dito',
+    debito: 'Cart\u00e3o de d\u00e9bito'
+};
+
+function normalizePaymentType(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function paymentLabel(type) {
+    return PAYMENT_LABELS[normalizePaymentType(type)] || '';
+}
+
+function paymentSummaryText(payment) {
+    if (!payment || !payment.label) return '';
+    if (payment.tipo === 'dinheiro') {
+        if (payment.precisaTroco && payment.trocoPara) {
+            return `${payment.label} - Troco para ${payment.trocoPara}`;
+        }
+        return `${payment.label} - Sem troco`;
+    }
+    return payment.label;
+}
+
+function buildPaymentSummaryHtml(payment) {
+    const summary = paymentSummaryText(payment);
+    return summary ? `<p><strong>Pagamento:</strong> ${escapeHtml(summary)}</p>` : '';
 }
 
 function buildOrderSummaryHtml(info) {
@@ -433,6 +465,8 @@ const modalImage = document.getElementById('modal-image');
 const modalTitle = document.getElementById('modal-title');
 const modalDesc = document.getElementById('modal-desc');
 const modalPrice = document.getElementById('modal-price');
+const pizzaBorderContainer = document.getElementById('pizza-border-container');
+const burgerAddonsContainer = document.getElementById('burger-addons-container');
 const qtyDecrease = document.getElementById('qty-decrease');
 const qtyIncrease = document.getElementById('qty-increase');
 const qtyValue = document.getElementById('qty-value');
@@ -445,6 +479,26 @@ const cartClose = document.getElementById('cart-close');
 const cartItemsContainer = document.getElementById('cart-items');
 const cartTotal = document.getElementById('cart-total');
 const finalizeButton = document.getElementById('btn-finalize');
+const paymentTypeSelect = document.getElementById('payment-type');
+const cashChangeOptions = document.getElementById('cash-change-options');
+const changeAmountField = document.getElementById('change-amount-field');
+const changeAmountInput = document.getElementById('change-amount');
+const trackOrderButton = document.getElementById('btn-track-order');
+const orderTrackingOverlay = document.getElementById('order-tracking-overlay');
+const orderTrackingModal = document.getElementById('order-tracking-modal');
+const orderTrackingClose = document.getElementById('order-tracking-close');
+const orderTrackingForm = document.getElementById('order-tracking-form');
+const orderTrackingCode = document.getElementById('order-tracking-code');
+const orderTrackingMessage = document.getElementById('order-tracking-message');
+const orderTrackingResult = document.getElementById('order-tracking-result');
+const orderSuccessOverlay = document.getElementById('order-success-overlay');
+const orderSuccessModal = document.getElementById('order-success-modal');
+const orderSuccessClose = document.getElementById('order-success-close');
+const orderSuccessCloseSecondary = document.getElementById('order-success-close-secondary');
+const orderSuccessCode = document.getElementById('order-success-code');
+const orderSuccessCopy = document.getElementById('order-success-copy');
+const orderSuccessWhatsapp = document.getElementById('order-success-whatsapp');
+const orderSuccessFeedback = document.getElementById('order-success-feedback');
 const cartOrderSummary = document.getElementById('cart-order-summary');
 const appToast = document.getElementById('app-toast');
 let toastTimer = null;
@@ -470,8 +524,64 @@ function normalizeText(value) {
         .toLowerCase();
 }
 
+function productCategoryKey(product) {
+    return normalizeText(product?.category || '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
 function isAcaiProduct(product) {
-    return product.category === 'acai' || normalizeText(product.title).includes('acai');
+    return productCategoryKey(product) === 'acai' || normalizeText(product?.title).includes('acai');
+}
+
+function isPizzaProduct(product) {
+    const category = productCategoryKey(product);
+    return category === 'pizzas' || category === 'pizzas-doces';
+}
+
+function isBurgerProduct(product) {
+    const category = productCategoryKey(product);
+    return category === 'hamburgueres' || category === 'hamburgueres-gourmet';
+}
+
+function getSelectedPizzaBorder() {
+    const selected = document.querySelector('input[name="pizza-border"]:checked');
+    if (!selected || !selected.value) return null;
+    const price = Number(selected.dataset.price || 0);
+    return {
+        nome: selected.value,
+        price,
+        label: `${selected.value} (+${formatPrice(price)})`
+    };
+}
+
+function getSelectedBurgerAddons() {
+    return [...document.querySelectorAll('.burger-adicional:checked')].map((item) => {
+        const price = Number(item.dataset.price || 0);
+        return {
+            nome: item.value,
+            price,
+            label: `${item.value} (+${formatPrice(price)})`
+        };
+    });
+}
+
+function getModalOptionsTotal() {
+    if (!currentProduct) return 0;
+
+    const borderTotal = isPizzaProduct(currentProduct)
+        ? (getSelectedPizzaBorder()?.price || 0)
+        : 0;
+    const burgerTotal = isBurgerProduct(currentProduct)
+        ? getSelectedBurgerAddons().reduce((sum, item) => sum + item.price, 0)
+        : 0;
+
+    return borderTotal + burgerTotal;
+}
+
+function updateModalPrice() {
+    if (!currentProduct || !modalPrice) return;
+    modalPrice.textContent = formatPrice(Number(currentProduct.price || 0) + getModalOptionsTotal());
 }
 
 function getAcaiDetails(title) {
@@ -514,10 +624,25 @@ function resetAcaiOptions() {
     updateAcaiCounter('');
 }
 
+function resetProductOptions() {
+    resetAcaiOptions();
+
+    document.querySelectorAll('input[name="pizza-border"]').forEach((input) => {
+        input.checked = input.value === '';
+    });
+
+    document.querySelectorAll('.burger-adicional').forEach((input) => {
+        input.checked = false;
+    });
+
+    if (pizzaBorderContainer) pizzaBorderContainer.hidden = true;
+    if (burgerAddonsContainer) burgerAddonsContainer.hidden = true;
+}
 function formatCartItemDetails(item) {
     const details = [];
     if (item.tamanho) details.push(`Tamanho: ${item.tamanho}`);
     if (item.sorvete) details.push(item.sorvete);
+    if (item.bordaRecheada) details.push(`Borda recheada: ${item.bordaRecheada}`);
     if (item.acompanhamentos.length) details.push(`Acompanhamentos: ${item.acompanhamentos.join(', ')}`);
     if (item.calda) details.push(`Calda: ${item.calda}`);
     if (item.adicionais.length) details.push(`Adicionais: ${item.adicionais.join(', ')}`);
@@ -544,6 +669,15 @@ function saveCart(cart) {
 }
 
 function getOrders() {
+    if (window.MKStore && typeof MKStore.orders === 'function') {
+        try {
+            const data = MKStore.orders();
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            console.warn(`N\u00e3o foi poss\u00edvel ler pedidos pelo MKStore. ${error.message}`);
+        }
+    }
+
     try {
         const data = JSON.parse(localStorage.getItem('mk_pedidos') || '[]');
         return Array.isArray(data) ? data : [];
@@ -553,7 +687,99 @@ function getOrders() {
 }
 
 function saveOrders(orders) {
-    localStorage.setItem('mk_pedidos', JSON.stringify(orders));
+    const safeOrders = Array.isArray(orders) ? orders : [];
+    if (window.MKStore && typeof MKStore.saveOrders === 'function') {
+        MKStore.saveOrders(safeOrders);
+        return;
+    }
+
+    localStorage.setItem('mk_pedidos', JSON.stringify(safeOrders));
+}
+
+function normalizePaymentFromForm(showAlerts = false) {
+    const type = normalizePaymentType(paymentTypeSelect?.value);
+    const label = paymentLabel(type);
+
+    if (!label) {
+        if (showAlerts) alert('Escolha o tipo de pagamento antes de finalizar.');
+        return null;
+    }
+
+    const payment = {
+        tipo: type,
+        label,
+        precisaTroco: false,
+        trocoPara: ''
+    };
+
+    if (type === 'dinheiro') {
+        const changeChoice = document.querySelector('input[name="needs-change"]:checked')?.value || '';
+        if (!changeChoice) {
+            if (showAlerts) alert('Informe se precisa de troco.');
+            return null;
+        }
+
+        payment.precisaTroco = changeChoice === 'sim';
+        if (payment.precisaTroco) {
+            payment.trocoPara = String(changeAmountInput?.value || '').trim();
+            if (!payment.trocoPara) {
+                if (showAlerts) alert('Informe o valor para troco.');
+                return null;
+            }
+        }
+    }
+
+    payment.resumo = paymentSummaryText(payment);
+    return payment;
+}
+
+function paymentFromOrder(order) {
+    const raw = order?.pagamento || order?.dadosPedido?.pagamento || null;
+    if (raw && typeof raw === 'object') {
+        const tipo = normalizePaymentType(raw.tipo || raw.type || order.tipoPagamento);
+        const label = raw.label || paymentLabel(tipo) || order.tipoPagamento || '';
+        const payment = {
+            tipo,
+            label,
+            precisaTroco: !!(raw.precisaTroco || raw.needsChange),
+            trocoPara: raw.trocoPara || raw.changeFor || ''
+        };
+        payment.resumo = raw.resumo || paymentSummaryText(payment);
+        return payment;
+    }
+
+    const tipo = normalizePaymentType(order?.tipoPagamento);
+    const label = paymentLabel(tipo) || order?.tipoPagamento || '';
+    if (!label) return null;
+
+    const payment = {
+        tipo,
+        label,
+        precisaTroco: !!order?.precisaTroco,
+        trocoPara: order?.trocoPara || ''
+    };
+    payment.resumo = paymentSummaryText(payment);
+    return payment;
+}
+
+function syncPaymentFields() {
+    const type = normalizePaymentType(paymentTypeSelect?.value);
+    const isCash = type === 'dinheiro';
+    if (cashChangeOptions) cashChangeOptions.hidden = !isCash;
+
+    const changeChoice = document.querySelector('input[name="needs-change"]:checked')?.value || '';
+    if (changeAmountField) changeAmountField.hidden = !(isCash && changeChoice === 'sim');
+    if (!isCash) {
+        document.querySelectorAll('input[name="needs-change"]').forEach((input) => {
+            input.checked = false;
+        });
+        if (changeAmountInput) changeAmountInput.value = '';
+    }
+    if (isCash && changeChoice !== 'sim' && changeAmountInput) {
+        changeAmountInput.value = '';
+    }
+
+    renderCartOrderSummary();
 }
 
 function updateCartCount() {
@@ -614,6 +840,8 @@ function addToCart(product, qty = 1) {
         item.calda === product.calda &&
         item.tamanho === product.tamanho &&
         item.sorvete === product.sorvete &&
+        item.bordaRecheada === product.bordaRecheada &&
+        Number(item.bordaRecheadaValor || 0) === Number(product.bordaRecheadaValor || 0) &&
         Number(item.adicional || 0) === Number(product.adicional || 0)
     );
 
@@ -630,6 +858,8 @@ function addToCart(product, qty = 1) {
             calda: product.calda || '',
             tamanho: product.tamanho || '',
             sorvete: product.sorvete || '',
+            bordaRecheada: product.bordaRecheada || '',
+            bordaRecheadaValor: product.bordaRecheadaValor || 0,
             adicional: product.adicional || 0
         });
     }
@@ -642,7 +872,8 @@ function renderCartOrderSummary() {
     if (!cartOrderSummary) return;
 
     const info = getOrderContext();
-    const html = buildOrderSummaryHtml(info);
+    const payment = normalizePaymentFromForm(false);
+    const html = buildOrderSummaryHtml(info) + buildPaymentSummaryHtml(payment);
 
     if (!html) {
         cartOrderSummary.classList.remove('active');
@@ -687,6 +918,7 @@ function renderCart() {
             <h3>${escapeHtml(item.title)}</h3>
             ${item.tamanho ? `<span><strong>Tamanho:</strong> ${escapeHtml(item.tamanho)}</span>` : ''}
             ${item.sorvete ? `<span><strong>Sorvete:</strong> ${escapeHtml(item.sorvete)}</span>` : ''}
+            ${item.bordaRecheada ? `<span><strong>Borda recheada:</strong> ${escapeHtml(item.bordaRecheada)}</span>` : ''}
             ${item.acompanhamentos.length ? `<span><strong>Acompanhamentos:</strong> ${escapeHtml(item.acompanhamentos.join(', '))}</span>` : ''}
             ${item.adicionais.length ? `<span><strong>Adicionais:</strong> ${escapeHtml(item.adicionais.join(', '))}</span>` : ''}
             ${item.calda ? `<span><strong>Calda:</strong> ${escapeHtml(item.calda)}</span>` : ''}
@@ -727,6 +959,9 @@ function finalizeOrder() {
         return;
     }
 
+    const payment = normalizePaymentFromForm(true);
+    if (!payment) return;
+
     const pedidos = getOrders();
     const tipoPedido = getTipoPedido(orderContext);
     const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -744,7 +979,11 @@ function finalizeOrder() {
             ? (orderContext.observacaoPedido || '')
             : (orderContext.observacao || ''),
         horarioRetirada: orderContext.horarioRetirada || '',
-        dadosPedido: orderContext,
+        dadosPedido: { ...orderContext, pagamento: payment },
+        pagamento: payment,
+        tipoPagamento: payment.label,
+        precisaTroco: payment.precisaTroco,
+        trocoPara: payment.trocoPara,
         total,
         itens: cart.map(formatCartItemLine),
         itensDetalhados: cart,
@@ -757,9 +996,11 @@ function finalizeOrder() {
     saveOrders(pedidos);
     localStorage.removeItem('mk_cart');
 
-    alert('Pedido enviado para a cozinha!');
+    if (paymentTypeSelect) paymentTypeSelect.value = '';
+    syncPaymentFields();
     updateCartCount();
     closeCartPanel();
+    openOrderSuccessModal(novoPedido);
 }
 
 function openCart() {
@@ -779,6 +1020,158 @@ function closeCartPanel() {
     cartPanel.setAttribute('aria-hidden', 'true');
 }
 
+function statusLabel(status) {
+    const labels = {
+        aguardando: 'aguardando',
+        preparando: 'preparando',
+        pronto: 'pronto',
+        entregue: 'entregue',
+        cancelado: 'cancelado',
+        finalizado: 'entregue',
+        recebidos: 'aguardando'
+    };
+    const normalized = String(status || 'aguardando').trim().toLowerCase();
+    return labels[normalized] || normalized || 'aguardando';
+}
+
+function formatDateTime(value) {
+    const date = new Date(value || Date.now());
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString('pt-BR');
+}
+
+function findOrderByCode(code) {
+    const normalizedCode = String(code || '').trim().toLowerCase();
+    if (!normalizedCode) return null;
+    return getOrders().find((order) => {
+        const currentCode = String(order?.codigo || '').trim().toLowerCase();
+        const currentId = String(order?.id || '').trim().toLowerCase();
+        return currentCode === normalizedCode || currentId === normalizedCode;
+    }) || null;
+}
+
+function renderTrackedOrder(order) {
+    if (!orderTrackingResult) return;
+
+    const tipo = getTipoPedido(order) || 'retirada';
+    const items = Array.isArray(order.itens) && order.itens.length
+        ? order.itens.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+        : '<li>Itens n\u00e3o informados</li>';
+    const payment = paymentFromOrder(order);
+
+    orderTrackingResult.innerHTML = `
+        <div class="tracking-card">
+            <p><strong>C\u00f3digo:</strong> ${escapeHtml(order.codigo || order.id || '')}</p>
+            <p><strong>Cliente:</strong> ${escapeHtml(order.cliente || order.nome || 'Cliente')}</p>
+            <p><strong>Tipo:</strong> ${escapeHtml(tipoPedidoLabel(tipo))}</p>
+            <p><strong>Status:</strong> ${escapeHtml(statusLabel(order.status))}</p>
+            <p><strong>Hor\u00e1rio:</strong> ${escapeHtml(formatDateTime(order.criadoEm || order.data || order.id))}</p>
+            ${buildPaymentSummaryHtml(payment)}
+            <ul>${items}</ul>
+            <p><strong>Total:</strong> ${formatPrice(order.total || 0)}</p>
+        </div>
+    `;
+}
+
+function clearOrderTrackingResult() {
+    if (orderTrackingMessage) orderTrackingMessage.textContent = '';
+    if (orderTrackingResult) orderTrackingResult.innerHTML = '';
+}
+
+function openOrderTrackingModal() {
+    if (!orderTrackingModal || !orderTrackingOverlay) return;
+    clearOrderTrackingResult();
+    orderTrackingModal.classList.add('active');
+    orderTrackingOverlay.classList.add('active');
+    orderTrackingModal.removeAttribute('hidden');
+    orderTrackingOverlay.removeAttribute('hidden');
+    orderTrackingModal.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => orderTrackingCode?.focus(), 0);
+}
+
+function closeOrderTrackingModal() {
+    if (!orderTrackingModal || !orderTrackingOverlay) return;
+    orderTrackingModal.classList.remove('active');
+    orderTrackingOverlay.classList.remove('active');
+    orderTrackingModal.setAttribute('hidden', '');
+    orderTrackingOverlay.setAttribute('hidden', '');
+    orderTrackingModal.setAttribute('aria-hidden', 'true');
+}
+
+function setOrderSuccessFeedback(message, isError = false) {
+    if (!orderSuccessFeedback) return;
+    orderSuccessFeedback.textContent = message || '';
+    orderSuccessFeedback.classList.toggle('error', !!isError);
+}
+
+function openOrderSuccessModal(order) {
+    if (!orderSuccessModal || !orderSuccessOverlay) return;
+    const code = String(order?.codigo || order?.id || '').trim();
+    if (orderSuccessCode) orderSuccessCode.textContent = code;
+    orderSuccessModal.dataset.orderCode = code;
+    setOrderSuccessFeedback('');
+
+    orderSuccessModal.classList.add('active');
+    orderSuccessOverlay.classList.add('active');
+    orderSuccessModal.removeAttribute('hidden');
+    orderSuccessOverlay.removeAttribute('hidden');
+    orderSuccessModal.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => orderSuccessCopy?.focus(), 0);
+}
+
+function closeOrderSuccessModal() {
+    if (!orderSuccessModal || !orderSuccessOverlay) return;
+    orderSuccessModal.classList.remove('active');
+    orderSuccessOverlay.classList.remove('active');
+    orderSuccessModal.setAttribute('hidden', '');
+    orderSuccessOverlay.setAttribute('hidden', '');
+    orderSuccessModal.setAttribute('aria-hidden', 'true');
+    setOrderSuccessFeedback('');
+}
+
+function copyTextFallback(text) {
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.position = 'fixed';
+    field.style.left = '-9999px';
+    document.body.appendChild(field);
+    field.select();
+    let copied = false;
+    try {
+        copied = document.execCommand('copy');
+    } catch (error) {
+        copied = false;
+    }
+    field.remove();
+    return copied;
+}
+
+async function copyOrderSuccessCode() {
+    const code = String(orderSuccessModal?.dataset.orderCode || orderSuccessCode?.textContent || '').trim();
+    if (!code) return;
+
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(code);
+        } else if (!copyTextFallback(code)) {
+            throw new Error('Clipboard indisponivel');
+        }
+        setOrderSuccessFeedback('C\u00f3digo copiado!');
+    } catch (error) {
+        const copied = copyTextFallback(code);
+        setOrderSuccessFeedback(copied ? 'C\u00f3digo copiado!' : 'N\u00e3o foi poss\u00edvel copiar o c\u00f3digo automaticamente.', !copied);
+    }
+}
+
+function openOrderCodeWhatsapp() {
+    const code = String(orderSuccessModal?.dataset.orderCode || orderSuccessCode?.textContent || '').trim();
+    if (!code) return;
+    const message = `Ol\u00e1! Acabei de fazer um pedido. Meu c\u00f3digo \u00e9: ${code}`;
+    const number = String(WHATSAPP_NUMBER || '').replace(/\D/g, '');
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener');
+}
 function openModal(product) {
     currentProduct = product;
     currentQty = 1;
@@ -790,13 +1183,11 @@ function openModal(product) {
     qtyValue.textContent = currentQty;
 
     const extrasContainer = document.getElementById('extras-container');
-    resetAcaiOptions();
-    if (isAcaiProduct(product)) {
-        extrasContainer.style.display = 'block';
-    } else {
-        extrasContainer.style.display = 'none';
-    }
-
+    resetProductOptions();
+    extrasContainer.style.display = isAcaiProduct(product) ? 'block' : 'none';
+    if (pizzaBorderContainer) pizzaBorderContainer.hidden = !isPizzaProduct(product);
+    if (burgerAddonsContainer) burgerAddonsContainer.hidden = !isBurgerProduct(product);
+    updateModalPrice();
     modal.classList.add('active');
     modalOverlay.classList.add('active');
     modal.removeAttribute('hidden');
@@ -811,7 +1202,7 @@ function closeModal() {
     modal.setAttribute('aria-hidden', 'true');
     currentProduct = null;
 
-    resetAcaiOptions();
+    resetProductOptions();
 }
 
 if (productsContainer) {
@@ -845,6 +1236,69 @@ if (finalizeButton) {
     finalizeButton.addEventListener('click', finalizeOrder);
 }
 
+if (paymentTypeSelect) {
+    paymentTypeSelect.addEventListener('change', syncPaymentFields);
+}
+
+document.querySelectorAll('input[name="needs-change"]').forEach((input) => {
+    input.addEventListener('change', syncPaymentFields);
+});
+
+if (changeAmountInput) {
+    changeAmountInput.addEventListener('input', renderCartOrderSummary);
+}
+
+if (trackOrderButton) {
+    trackOrderButton.addEventListener('click', openOrderTrackingModal);
+}
+
+if (orderTrackingClose) {
+    orderTrackingClose.addEventListener('click', closeOrderTrackingModal);
+}
+
+if (orderTrackingOverlay) {
+    orderTrackingOverlay.addEventListener('click', closeOrderTrackingModal);
+}
+
+if (orderTrackingForm) {
+    orderTrackingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const order = findOrderByCode(orderTrackingCode?.value);
+        if (!order) {
+            if (orderTrackingResult) orderTrackingResult.innerHTML = '';
+            if (orderTrackingMessage) {
+                orderTrackingMessage.textContent = 'Pedido n\u00e3o encontrado. Verifique o c\u00f3digo e tente novamente.';
+            }
+            return;
+        }
+
+        if (orderTrackingMessage) orderTrackingMessage.textContent = '';
+        renderTrackedOrder(order);
+    });
+}
+
+if (orderSuccessClose) {
+    orderSuccessClose.addEventListener('click', closeOrderSuccessModal);
+}
+
+if (orderSuccessCloseSecondary) {
+    orderSuccessCloseSecondary.addEventListener('click', closeOrderSuccessModal);
+}
+
+if (orderSuccessOverlay) {
+    orderSuccessOverlay.addEventListener('click', closeOrderSuccessModal);
+}
+
+if (orderSuccessCopy) {
+    orderSuccessCopy.addEventListener('click', copyOrderSuccessCode);
+}
+
+if (orderSuccessWhatsapp) {
+    orderSuccessWhatsapp.addEventListener('click', openOrderCodeWhatsapp);
+}
+
+syncPaymentFields();
+
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         if (cartPanel.classList.contains('active')) {
@@ -855,6 +1309,12 @@ document.addEventListener('keydown', (event) => {
         }
         if (orderIntakeModal.classList.contains('active')) {
             closeOrderIntakeModal();
+        }
+        if (orderTrackingModal.classList.contains('active')) {
+            closeOrderTrackingModal();
+        }
+        if (orderSuccessModal.classList.contains('active')) {
+            closeOrderSuccessModal();
         }
     }
 });
@@ -896,6 +1356,9 @@ if (qtyIncrease) {
     });
 }
 
+document.querySelectorAll('input[name="pizza-border"], .burger-adicional').forEach((input) => {
+    input.addEventListener('change', updateModalPrice);
+});
 if (addToCartBtn) {
     addToCartBtn.addEventListener('click', () => {
         if (!currentProduct) return;
@@ -904,10 +1367,24 @@ if (addToCartBtn) {
         let adicionais = [];
         let calda = '';
         let adicionaisValor = 0;
+        let bordaRecheada = '';
+        let bordaRecheadaValor = 0;
 
         const isAcai = isAcaiProduct(currentProduct);
         let tamanho = '';
         let sorvete = '';
+
+        const selectedBorder = isPizzaProduct(currentProduct) ? getSelectedPizzaBorder() : null;
+        if (selectedBorder) {
+            bordaRecheada = selectedBorder.label;
+            bordaRecheadaValor = selectedBorder.price;
+        }
+
+        if (isBurgerProduct(currentProduct)) {
+            const burgerAddons = getSelectedBurgerAddons();
+            adicionais = burgerAddons.map((item) => item.label);
+            adicionaisValor += burgerAddons.reduce((sum, item) => sum + item.price, 0);
+        }
 
         if (isAcai) {
             acompanhamentos = getAcaiSelectedAcompanhamentos();
@@ -932,10 +1409,12 @@ if (addToCartBtn) {
             calda,
             tamanho,
             sorvete,
+            bordaRecheada,
+            bordaRecheadaValor,
             adicional: adicionaisValor
         };
 
-        produtoFinal.price += adicionaisValor;
+        produtoFinal.price += adicionaisValor + bordaRecheadaValor;
 
         const productTitle = currentProduct.title;
 

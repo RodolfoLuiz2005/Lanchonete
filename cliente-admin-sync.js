@@ -2,12 +2,10 @@
   const CATEGORY_ORDER = [
     "Pizzas",
     "Pizzas Doces",
-    "Bordas Recheadas",
     "Hambúrgueres",
     "Hambúrgueres Gourmet",
     "Beirutes",
     "Porções",
-    "Adicionais",
     "Sorvete",
     "Açaí",
     "Sucos",
@@ -56,6 +54,10 @@
       .trim();
   }
 
+  function isModalOptionCategory(value){
+    const category = normalizeForMatch(normalizeCategory(value));
+    return category === 'bordas recheadas' || category === 'adicionais';
+  }
   function isOutroProductName(value){
     const name = normalizeForMatch(value);
     return name === 'outro' || name === 'outros';
@@ -207,7 +209,9 @@
 
     const activePromos = MKStore.promos().filter((promo) => promo.ativa !== false);
     const activeProducts = dedupeProductsForRender(MKStore.products().filter((product) => (
-      product.disponivel !== false && !isOutroProductName(product.nome || product.name || product.title)
+      product.disponivel !== false
+      && !isOutroProductName(product.nome || product.name || product.title)
+      && !isModalOptionCategory(product.categoria || product.category)
     )));
 
     const promoGeneralCards = activePromos.filter((promo) => promo.mostrarNoCardapioGeral);
